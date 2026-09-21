@@ -38,14 +38,14 @@ $aboutNameRest = $aboutNamePrefix !== null ? substr($name, strlen('Adv. ')) : $n
 
     <?php /* 1. Hero ------------------------------------------------------------- */ ?>
     <section class="mhero">
-        <?php /* Full photograph (studio background included), `cover`-fitted into
-                 its panel - see .mhero__media in site.css. */ ?>
+        <?php /* Background-free cut-out, so the hero's own dark ground shows through -
+                 see .mhero__media in site.css. */ ?>
         <div class="mhero__media" aria-hidden="true">
             <picture>
                 <source srcset="<?= e(src_set('/img/advocate-cutout.webp')) ?>"
                         sizes="<?= e($mheroSizes) ?>" type="image/webp">
                 <img src="/img/advocate-cutout.png"<?= srcset_attr('/img/advocate-cutout.png') ?>
-                     sizes="<?= e($mheroSizes) ?>" alt="" width="1280" height="1037"
+                     sizes="<?= e($mheroSizes) ?>" alt="" width="833" height="766"
                      fetchpriority="high">
             </picture>
         </div>

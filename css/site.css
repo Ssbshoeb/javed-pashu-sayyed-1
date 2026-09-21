@@ -1625,8 +1625,11 @@ html:not(.js-reveal) .ruled::after { transform: scaleX(1); }
 }
 .mhero__media img {
   width: 100%; height: 100%;
-  object-fit: cover;
-  object-position: center;
+  object-fit: contain;
+  object-position: bottom right;
+  /* Shot slightly under; the lift is on the subject alone since there is no
+     background behind the cut-out to blow out. */
+  filter: brightness(1.1) contrast(1.02);
 }
 /* The photograph runs under the text on narrow screens, so it is faded from the
    left rather than cropped - the face stays visible, the words stay readable. */
@@ -3318,11 +3321,11 @@ html:not(.js-reveal) .ruled::after { transform: scaleX(1); }
   .mhero__media img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    object-position: center;
+    object-fit: contain;
+    object-position: bottom right;
   }
   /* Nothing is cropped now, so there is no hard vertical cut to dissolve and the
-     wash would only dim the lectern. */
+     wash would only dim the cut-out. */
   .mhero__media::after { display: none; }
 
   /* Three centred columns under a hairline, icon above the words. */
@@ -3370,14 +3373,15 @@ html:not(.js-reveal) .ruled::after { transform: scaleX(1); }
     order: 2;
     position: relative;
     inset: auto;
-    width: 100%;
-    /* The photograph's own ratio, so `cover` has nothing to crop here either. */
-    aspect-ratio: 1.2343;
-    margin-top: clamp(14px, 4vw, 22px);
+    width: 62%;
+    max-width: 320px;
+    height: auto;
+    margin: clamp(14px, 4vw, 22px) auto 0;
   }
   .mhero__media img {
-    object-fit: cover;
-    object-position: center;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
   }
 
   /* The copy no longer shares its line with anything, so the caps that kept it
