@@ -1,0 +1,7 @@
+[30-Aug-2026 15:30:15 Asia/Kolkata] PHP Fatal error:  Uncaught RuntimeException: View not found: pages/home in /home/u221158245/domains/javedpashusayyed.com/public_html/app/support/view.php:56
+Stack trace:
+#0 /home/u221158245/domains/javedpashusayyed.com/public_html/app/support/view.php(84): render()
+#1 /home/u221158245/domains/javedpashusayyed.com/public_html/app/controllers/pages.php(68): view()
+#2 /home/u221158245/domains/javedpashusayyed.com/public_html/index.php(160): page_home()
+#3 {main}
+  thrown in /home/u221158245/domains/javedpashusayyed.com/public_html/app/support/view.php on line 56

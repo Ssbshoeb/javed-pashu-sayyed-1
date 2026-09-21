@@ -1,0 +1,3704 @@
+/* ==========================================================================
+   Adv. Javed Sayyed — site stylesheet
+   Palette : oxblood accent on a warm-neutral paper, single committed theme
+   Type    : Newsreader (display) / Public Sans (text) / ui-monospace (data)
+   ========================================================================== */
+
+/* With a fixed-width viewport the page is scaled by the browser. Safari on iOS
+   also inflates text on its own, which would break the "identical to the laptop"
+   requirement, so that behaviour is switched off. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+:root {
+  /* The palette is a single committed light theme. Without this declaration,
+     Chrome on Android applies its "Auto dark theme" to the page and invents a
+     dark version of it: the gold turns muddy maroon and the paper turns black.
+     "only light" is the documented opt-out from that forced inversion. */
+  color-scheme: only dark;
+
+  /* Single committed DARK theme (29 Aug 2026). The site used to run the home
+     page dark and the inner pages on a warm paper palette; the client asked for
+     one dark treatment throughout, so these tokens were inverted rather than
+     each light section being overridden one at a time. The names still describe
+     the ROLE, not the shade - --paper is the page ground, --ink is the primary
+     text - which is why every component that was already written against them
+     flipped correctly without being touched. */
+  --paper:        #010B14;   /* page ground, same as --mock-ink */
+  --surface:      #0C1326;   /* cards, inputs, raised panels */
+  --surface-sunk: #071019;   /* recessed sections */
+  --ink:          #F2F5F8;   /* primary text */
+  --ink-soft:     #B8C6D6;   /* body text */
+  --muted:        #8B99AB;
+  --rule:         rgba(255, 255, 255, 0.12);
+  --rule-strong:  rgba(255, 255, 255, 0.24);
+
+  /* deep navy carries the authority, gold is the single bright note */
+  --navy:         #0E1B2C;
+  --navy-2:       #17293F;
+  --navy-3:       #22384F;
+  /* Brightened for a dark ground - the old #A8842C was mixed for gold on paper
+     and reads as mud on ink. Anywhere --accent is a BACKGROUND behind white
+     text now needs dark text instead; those rules are marked where they occur. */
+  --accent:       #DCA955;
+  /* Deliberately left dark: it is the fill behind #fff button text, and
+     lightening it would drop that contrast below legibility. */
+  --accent-deep:  #8A6A23;
+  --accent-lift:  #E8C176;
+  --accent-tint:  rgba(220, 169, 85, 0.12);
+  --focus:        #6BA8E8;
+
+  /* One definition for each face. The display stack used to be written out by
+     hand in three slightly different forms - and six rules referred to
+     var(--font-display), which was never defined, so they silently fell back to
+     an unquoted Newsreader with no Georgia behind it. Those six lost the
+     intermediate fallback the other rules had, which showed up as two different
+     serifs on screen whenever Newsreader was slow or blocked. */
+  --font-display: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-body: "Public Sans", ui-sans-serif, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-script: "Allura", "Newsreader", Georgia, cursive;
+
+  --measure: 66ch;
+  --gutter: clamp(20px, 5vw, 56px);
+  --shell: 1180px;
+
+  --step-0: 1rem;
+  --step-1: 1.125rem;
+  --step-2: clamp(1.3rem, 1.1rem + 0.6vw, 1.6rem);
+  --step-3: clamp(1.6rem, 1.3rem + 1.2vw, 2.2rem);
+  --step-4: clamp(2.1rem, 1.6rem + 2.2vw, 3.4rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+/* The masthead is sticky, so anchored sections stop below it rather than
+   sliding underneath. */
+:target,
+[id] { scroll-margin-top: 96px; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+body.is-locked { overflow: hidden; }
+
+img { max-width: 100%; height: auto; display: block; }
+
+a { color: var(--accent-deep); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { color: var(--navy); }
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* --- typography ---------------------------------------------------------- */
+
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.012em;
+  margin: 0;
+  text-wrap: balance;
+  color: var(--ink);
+}
+
+h1 { font-size: var(--step-4); }
+h2 { font-size: var(--step-3); }
+h3 { font-size: var(--step-2); }
+h4 { font-size: var(--step-1); }
+
+p { margin: 0 0 1rem; max-width: var(--measure); }
+p:last-child { margin-bottom: 0; }
+
+.lede {
+  font-size: var(--step-1);
+  color: var(--ink-soft);
+  max-width: 60ch;
+}
+
+.eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--accent-deep);
+  margin: 0 0 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.eyebrow::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: var(--rule);
+}
+
+.ref {
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* --- shell & sections ---------------------------------------------------- */
+
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section { padding-block: clamp(48px, 7vw, 84px); }
+.section--tight { padding-block: clamp(36px, 5vw, 56px); }
+.section--sunk { background: var(--surface-sunk); }
+.section--surface { background: var(--surface); }
+.section + .section { border-top: 1px solid var(--rule); }
+
+.stack { display: flex; flex-direction: column; gap: 1rem; }
+.stack--lg { gap: 1.75rem; }
+.stack--sm { gap: 0.5rem; }
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: start;
+}
+@media (max-width: 860px) { .split { grid-template-columns: 1fr; } }
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--ink);
+  color: #fff;
+  padding: 10px 16px;
+  z-index: 100;
+}
+.skip-link:focus { left: 8px; top: 8px; }
+
+/* --- header -------------------------------------------------------------- */
+
+.masthead {
+  background: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.masthead__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  min-height: 74px;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--ink);
+}
+.brand__name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: -0.01em;
+}
+.brand__rule {
+  width: 3px;
+  align-self: stretch;
+  background: var(--accent);
+}
+.brand__role {
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.nav { display: flex; align-items: center; gap: 4px; }
+.nav a {
+  color: var(--ink-soft);
+  text-decoration: none;
+  font-size: 0.92rem;
+  font-weight: 500;
+  padding: 8px 11px;
+  border-bottom: 2px solid transparent;
+  /* A nav label must never break across two lines: the item then stands taller
+     than its neighbours and the whole bar looks misaligned. "Practice Areas" and
+     "Consult Now" are the two that were breaking once the brand lockup beside
+     them grew wider. Keeping them whole means the row either fits or the
+     hamburger takes over - never a half-broken bar. */
+  white-space: nowrap;
+}
+.nav a:hover { color: var(--accent); }
+.nav a[aria-current="page"] {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.nav__cta {
+  margin-left: 10px;
+  background: var(--accent-deep);
+  color: #fff !important;
+  padding: 9px 16px !important;
+  border-bottom: 0 !important;
+  border-radius: 2px;
+}
+/* Dark text, not white: --accent is now a bright gold and white on it is
+   illegible. Same fix on .btn--gold:hover. */
+.nav__cta:hover { background: var(--accent); color: var(--mock-ink) !important; }
+
+.nav-toggle {
+  display: none;
+  background: none;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  padding: 9px 13px;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+@media (max-width: 1200px) {
+  .nav-toggle { display: block; }
+  .nav {
+    display: none;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background: var(--surface);
+    border-bottom: 1px solid var(--rule);
+    padding: 8px var(--gutter) 20px;
+    box-shadow: 0 14px 24px -18px rgba(25, 21, 23, 0.5);
+  }
+  .nav.is-open { display: flex; }
+  .nav a { padding: 12px 0; border-bottom: 1px solid var(--rule); }
+  .nav a[aria-current="page"] { border-bottom-color: var(--rule); color: var(--accent); }
+  .nav__cta { margin: 14px 0 0; text-align: center; }
+}
+
+/* --- hero ---------------------------------------------------------------- */
+
+/* Inner-page banner: the same photographic treatment as the home hero, at a
+   quieter height so it introduces the page rather than competing with it. */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--navy);
+  color: #fff;
+  border-bottom: 3px solid var(--accent);
+  padding-block: clamp(56px, 8vw, 92px);
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -10% 0;
+  background-image: var(--hero-image, url("/img/band.webp"));
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+  will-change: transform;
+}
+/* The hero photograph is 1700px wide and sits behind a gradient that covers
+   most of it, so a phone downloading the full file spends about 200KB on
+   detail it cannot show. heroImage() sets these two only for a width that was
+   actually generated, and each falls back through to the next size up, so a
+   photograph with no narrow variant still resolves to something that exists.
+   Widths come from scripts/gen-responsive.mjs — change them in both places. */
+@media (max-width: 1200px) {
+  .hero::before {
+    background-image: var(--hero-image-md, var(--hero-image, url("/img/band-1024.webp")));
+  }
+}
+@media (max-width: 700px) {
+  .hero::before {
+    background-image: var(--hero-image-sm, var(--hero-image-md, var(--hero-image, url("/img/band-640.webp"))));
+  }
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(100deg, rgba(9, 18, 30, 0.95) 0%, rgba(11, 23, 37, 0.88) 46%, rgba(14, 27, 44, 0.62) 100%),
+    radial-gradient(110% 90% at 90% 10%, rgba(168, 132, 44, 0.2), transparent 60%);
+}
+.hero > .shell { position: relative; z-index: 2; }
+
+.hero h1 { color: #fff; }
+.hero .lede { color: #B8C6D6; }
+.hero .eyebrow { color: var(--accent-lift); }
+.hero .eyebrow::after { background: rgba(255, 255, 255, 0.22); }
+.hero .breadcrumb { color: #92A2B4; }
+.hero .breadcrumb a { color: #C6D2DE; }
+
+.hero .hero__facts {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.hero .hero__facts .row { border-bottom-color: rgba(255, 255, 255, 0.12); }
+.hero .hero__facts dt { color: var(--accent-lift); }
+.hero .hero__facts dd { color: #E4EAF1; }
+
+.hero .hero__rail { border-left-color: var(--accent); }
+.hero .hero__rail .list-check li::before { background: var(--accent-lift); }
+.hero .hero__rail a { color: #D9E2EB; }
+.hero .hero__rail a:hover { color: var(--accent-lift); }
+
+.hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+}
+@media (max-width: 900px) { .hero__grid { grid-template-columns: 1fr; } }
+
+.hero h1 { margin-bottom: 1.1rem; }
+
+.hero__rail {
+  border-left: 2px solid var(--accent);
+  padding-left: clamp(18px, 2.5vw, 28px);
+}
+
+.hero__facts {
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--paper);
+}
+.hero__facts dl { margin: 0; }
+.hero__facts .row {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--rule);
+}
+.hero__facts .row:last-child { border-bottom: 0; }
+.hero__facts dt {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+}
+.hero__facts dd { margin: 0; font-size: 0.95rem; }
+
+/* --- buttons ------------------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 12px 22px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+/* Gold needs darkening before white text sits on it at an accessible contrast. */
+.btn--primary { background: var(--accent-deep); color: #fff; }
+.btn--primary:hover { background: #6A5119; color: #fff; }
+.btn--ghost { background: transparent; color: var(--ink); border-color: var(--rule-strong); }
+.btn--ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.textlink {
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+  padding-bottom: 1px;
+}
+
+/* --- cards --------------------------------------------------------------- */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.card {
+  background: var(--surface);
+  padding: 26px 26px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s ease;
+}
+a.card:hover { background: var(--accent-tint); }
+.card h3 { font-size: 1.22rem; }
+.card p { font-size: 0.94rem; color: var(--muted); margin: 0; }
+.card__more {
+  margin-top: auto;
+  padding-top: 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 22px;
+}
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-top: 2px solid var(--accent);
+  border-radius: 2px;
+  padding: 22px 24px;
+}
+.tile h3 { font-size: 1.1rem; margin-bottom: 6px; }
+.tile p { font-size: 0.93rem; color: var(--muted); }
+
+/* --- lists --------------------------------------------------------------- */
+
+.list-check { list-style: none; margin: 0; padding: 0; max-width: var(--measure); }
+.list-check li {
+  position: relative;
+  padding-left: 24px;
+  margin-bottom: 10px;
+}
+.list-check li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.66em;
+  width: 10px;
+  height: 1px;
+  background: var(--accent);
+}
+
+.list-steps { counter-reset: step; list-style: none; margin: 0; padding: 0; max-width: var(--measure); }
+.list-steps li {
+  counter-increment: step;
+  position: relative;
+  padding-left: 42px;
+  margin-bottom: 14px;
+}
+.list-steps li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: 0.04em;
+}
+
+/* --- quotes -------------------------------------------------------------- */
+
+.quotes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 24px;
+}
+.quote {
+  /* figure carries a 40px browser default margin, which on a phone left the card
+     inset inside its own carousel slide. */
+  margin: 0;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.quote blockquote {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.quote figcaption {
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  margin-top: auto;
+}
+
+/* --- accordion (FAQ) ----------------------------------------------------- */
+
+.faq { border-top: 1px solid var(--rule); max-width: var(--measure); }
+.faq details { border-bottom: 1px solid var(--rule); }
+.faq summary {
+  cursor: pointer;
+  padding: 16px 30px 16px 0;
+  font-weight: 600;
+  position: relative;
+  list-style: none;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after {
+  content: "+";
+  position: absolute;
+  right: 4px;
+  top: 14px;
+  color: var(--accent);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.faq details[open] summary::after { content: "\2212"; }
+.faq .faq__body { padding: 0 0 18px; color: var(--ink-soft); }
+
+/* --- forms --------------------------------------------------------------- */
+
+.form {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: clamp(22px, 3vw, 32px);
+}
+.form__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 18px;
+}
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field--wide { grid-column: 1 / -1; }
+.field label { font-size: 0.85rem; font-weight: 600; color: var(--ink-soft); }
+.field .hint { font-size: 0.8rem; color: var(--muted); }
+.req { color: var(--accent); }
+
+input[type="text"], input[type="email"], input[type="tel"], input[type="date"],
+input[type="file"], select, textarea {
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  padding: 11px 13px;
+  width: 100%;
+}
+textarea { resize: vertical; min-height: 140px; }
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+input[aria-invalid="true"], textarea[aria-invalid="true"], select[aria-invalid="true"] {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+}
+
+.checkbox {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+  line-height: 1.5;
+}
+.checkbox input { margin-top: 3px; flex: none; width: 16px; height: 16px; accent-color: var(--accent); }
+
+.error { color: var(--accent-deep); font-size: 0.82rem; font-weight: 600; }
+
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.notice {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--mock-gold);
+  background: var(--paper);
+  border-radius: 2px;
+  padding: 16px 18px;
+  font-size: 0.88rem;
+  color: var(--ink-soft);
+}
+.notice strong { color: var(--ink); }
+
+.alert {
+  background: var(--accent-tint);
+  border: 1px solid var(--accent);
+  border-radius: 2px;
+  padding: 14px 16px;
+  font-size: 0.9rem;
+  color: var(--accent-deep);
+}
+.alert ul { margin: 8px 0 0; padding-left: 18px; }
+
+/* --- article ------------------------------------------------------------- */
+
+.prose { max-width: var(--measure); }
+.prose p { font-size: 1.06rem; line-height: 1.75; color: var(--ink-soft); }
+/* The legal pages (terms, privacy, disclaimer, cookies) read more like a
+   reference document than an article, so the 66ch --measure column read as
+   cramped there - wider than an article, but still well short of the full
+   1180px .shell, which would make paragraphs uncomfortably long to track
+   line to line. The global `p { max-width: var(--measure) }` rule caps every
+   paragraph individually regardless of its container, so that has to be
+   lifted here too, not just the block's own max-width. */
+.prose--wide { max-width: 820px; }
+.prose--wide p,
+.prose--wide ul,
+.prose--wide li { max-width: none; }
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted);
+}
+.article-meta .tag { color: var(--accent); }
+
+.breadcrumb {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+.breadcrumb a { text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+
+/* --- contact ------------------------------------------------------------- */
+
+.map-frame {
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  overflow: hidden;
+  background: var(--surface-sunk);
+  aspect-ratio: 16 / 10;
+}
+.map-frame iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+.detail-list { margin: 0; }
+.detail-list .row {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 14px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.detail-list .row:first-child { border-top: 1px solid var(--rule); }
+.detail-list dt {
+  font-size: 0.7rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+  padding-top: 3px;
+}
+.detail-list dd { margin: 0; font-size: 0.96rem; }
+@media (max-width: 520px) {
+  .detail-list .row { grid-template-columns: 1fr; gap: 3px; }
+}
+
+/* --- footer -------------------------------------------------------------- */
+
+.footer {
+  background: var(--mock-ink);
+  border-top: 1px solid rgba(220, 169, 85, 0.22);
+  color: #B9C4D2;
+  padding-block: clamp(40px, 6vw, 64px) 28px;
+  font-size: 0.9rem;
+}
+.footer h4 {
+  color: var(--mock-gold);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+.footer a { color: #DCE3EC; text-decoration: none; }
+.footer a:hover { color: var(--mock-gold); text-decoration: underline; }
+.footer__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
+  gap: 34px;
+}
+.footer ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+/* The one place a script face is wanted: the client asked for this line to look
+   like a handwritten signature. Allura is thin and close to monoline, which is
+   what gives it that read - a formal copperplate face (Great Vibes, which the
+   head used to load) has too much thick/thin contrast to pass as handwriting. */
+.footer__brand {
+  font-family: var(--font-script);
+  /* A script face reads roughly two thirds the size of a serif set at the same
+     px, so it needs the extra size to sit level with the copy beneath it. And
+     it needs the line-height: the long ascenders and descenders clip against
+     the rule below at a tighter setting. */
+  font-size: clamp(2rem, 1.5rem + 1.5vw, 2.55rem);
+  font-weight: 400;
+  line-height: 1.25;
+  /* The name is too long for this column to hold on one line at a readable
+     script size, so it wraps - balanced, or it breaks after "Pashu" and leaves
+     "Sayyed" alone on the second line. */
+  text-wrap: balance;
+  color: #fff;
+  margin-bottom: 12px;
+  padding-bottom: 14px;
+  position: relative;
+}
+.footer__brand::after {
+  content: "";
+  position: absolute; left: 0; bottom: 0;
+  width: 52px; height: 2px;
+  background: var(--mock-gold);
+}
+.footer p { color: #9FADBE; max-width: 42ch; }
+.footer__bar {
+  margin-top: 34px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(220, 169, 85, 0.2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 26px;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  color: #8593A6;
+}
+.footer__legal-note {
+  margin-top: 22px;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-left: 3px solid var(--accent);
+  border-radius: 2px;
+  font-size: 0.82rem;
+  color: #9FADBE;
+  max-width: none;
+}
+
+/* --- disclaimer gate ----------------------------------------------------- */
+
+.gate {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(25, 21, 23, 0.72);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.gate[hidden] { display: none; }
+
+.gate__panel {
+  background: var(--surface);
+  border-radius: 2px;
+  border-top: 4px solid var(--accent);
+  width: min(680px, 100%);
+  max-height: calc(100vh - 40px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.6);
+}
+.gate__head {
+  padding: 26px clamp(22px, 4vw, 36px) 14px;
+  border-bottom: 1px solid var(--rule);
+}
+.gate__head h2 { font-size: 1.45rem; }
+.gate__head p { font-size: 0.82rem; color: var(--muted); margin: 6px 0 0; }
+.gate__body {
+  padding: 22px clamp(22px, 4vw, 36px);
+  overflow-y: auto;
+  font-size: 0.94rem;
+  line-height: 1.7;
+  color: var(--ink-soft);
+}
+.gate__body ul { margin: 14px 0; padding-left: 20px; }
+.gate__body li { margin-bottom: 10px; }
+.gate__foot {
+  padding: 18px clamp(22px, 4vw, 36px) 24px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+  background: var(--paper);
+}
+@media (max-width: 480px) {
+  .gate__foot { flex-direction: column-reverse; }
+  .gate__foot .btn { width: 100%; }
+}
+
+/* --- cookie banner ------------------------------------------------------- */
+
+.cookie {
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 50;
+  background: var(--surface);
+  border-top: 1px solid var(--rule-strong);
+  box-shadow: 0 -10px 24px -20px rgba(0, 0, 0, 0.6);
+  padding: 16px var(--gutter);
+}
+.cookie[hidden] { display: none; }
+.cookie__inner {
+  max-width: var(--shell);
+  margin-inline: auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 22px;
+  justify-content: space-between;
+}
+.cookie p { font-size: 0.86rem; color: var(--ink-soft); margin: 0; max-width: 68ch; }
+.cookie .btn { padding: 9px 18px; font-size: 0.88rem; }
+
+/* --- misc ---------------------------------------------------------------- */
+
+.center-narrow { max-width: 62ch; margin-inline: auto; text-align: center; }
+.center-narrow p { margin-inline: auto; }
+.center-narrow .eyebrow { justify-content: center; }
+.center-narrow .eyebrow::after { display: none; }
+.center-narrow .btn-row { justify-content: center; }
+
+.cta-band {
+  background: var(--navy);
+  color: #fff;
+  padding-block: clamp(40px, 6vw, 68px);
+}
+.cta-band h2 { color: #fff; }
+.cta-band p { color: #AEBBCA; }
+.cta-band .btn--ghost { color: #fff; border-color: rgba(255, 255, 255, 0.4); }
+.cta-band .btn--ghost:hover { border-color: #fff; color: #fff; }
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ==========================================================================
+   Home page — carousel hero, founder panel, service cards, stats, quotes
+   ========================================================================== */
+
+/* --- hero carousel ------------------------------------------------------- */
+
+.heroc {
+  position: relative;
+  background: var(--navy);
+  color: #fff;
+  overflow: hidden;
+  border-bottom: 3px solid var(--accent);
+}
+
+/* Background plates: each slide has its own photograph. They cross-fade while
+   the active one drifts slowly (Ken Burns), so the hero is never quite still. */
+.heroc__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+.heroc__plate {
+  position: absolute;
+  inset: -4%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity 1.4s ease;
+  will-change: transform, opacity;
+}
+.heroc__plate.is-active {
+  opacity: 1;
+  animation: kenburns 14s ease-out forwards;
+}
+@keyframes kenburns {
+  from { transform: scale(1.06) translate3d(0, 0, 0); }
+  to   { transform: scale(1.16) translate3d(-1.4%, -1.2%, 0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .heroc__plate.is-active { animation: none; transform: scale(1.06); }
+}
+
+/* Navy wash over the photograph: the type has to stay readable on any image. */
+.heroc__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    linear-gradient(100deg, rgba(9, 18, 30, 0.94) 0%, rgba(11, 23, 37, 0.86) 42%, rgba(14, 27, 44, 0.52) 100%),
+    radial-gradient(120% 90% at 88% 12%, rgba(168, 132, 44, 0.24), transparent 58%);
+}
+.heroc__scrim::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 84px);
+}
+
+.heroc__inner {
+  position: relative;
+  z-index: 2;
+  min-height: clamp(440px, 62vh, 620px);
+  display: flex;
+  align-items: center;
+  padding-block: clamp(56px, 8vw, 92px);
+}
+
+.heroc__slides { position: relative; width: 100%; }
+
+.heroc__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px);
+  transition: opacity 0.7s ease, transform 0.7s ease, visibility 0.7s;
+  max-width: 760px;
+}
+.heroc__slide.is-active {
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+}
+
+.heroc__eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--accent-lift);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1.1rem;
+}
+.heroc__eyebrow::before {
+  content: "";
+  width: 34px;
+  height: 2px;
+  background: var(--accent);
+  flex: none;
+}
+
+.heroc h1,
+.heroc h2 {
+  color: #fff;
+  font-size: clamp(2.05rem, 1.4rem + 2.8vw, 3.5rem);
+  line-height: 1.1;
+  margin-bottom: 1.1rem;
+}
+.heroc p {
+  color: #B8C6D6;
+  font-size: var(--step-1);
+  max-width: 56ch;
+  margin-bottom: 1.9rem;
+}
+
+.heroc__dots {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  gap: 10px;
+  padding-bottom: clamp(22px, 4vw, 34px);
+}
+.heroc__dots button {
+  width: 34px;
+  height: 4px;
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.28);
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+}
+.heroc__dots button[aria-selected="true"] { background: var(--accent-lift); }
+
+.btn--gold { background: var(--accent-deep); color: #fff; }
+.btn--gold:hover { background: var(--accent); color: var(--mock-ink); }
+.btn--onnavy { background: transparent; color: #fff; border-color: rgba(255,255,255,0.42); }
+.btn--onnavy:hover { border-color: var(--accent-lift); color: var(--accent-lift); }
+
+/* --- quick service cards (overlap the hero) ------------------------------ */
+
+.services {
+  position: relative;
+  z-index: 5;
+  margin-top: clamp(-56px, -5vw, -40px);
+}
+.services__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: 20px;
+}
+.service {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--accent);
+  border-radius: 2px;
+  padding: 26px 26px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 22px 40px -32px rgba(14, 27, 44, 0.55);
+}
+.service__icon {
+  width: 42px;
+  height: 42px;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.service h3 { font-size: 1.18rem; }
+.service p { font-size: 0.93rem; color: var(--muted); }
+.service .textlink { margin-top: auto; padding-top: 12px; color: var(--accent); align-self: flex-start; }
+
+/* --- founder panel ------------------------------------------------------- */
+
+.founder {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: start;
+}
+@media (max-width: 880px) { .founder { grid-template-columns: 1fr; } }
+
+.founder__portrait {
+  position: relative;
+  border-radius: 2px;
+  overflow: hidden;
+  background: linear-gradient(165deg, var(--navy-2), var(--navy));
+  aspect-ratio: 4 / 5;
+  display: flex;
+  align-items: flex-end;
+  border: 1px solid var(--rule);
+}
+.founder__portrait img { width: 100%; height: 100%; object-fit: cover; }
+.founder__portrait .placeholder {
+  padding: 26px;
+  color: #8FA2B8;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.founder__portrait::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0;
+  width: 62px;
+  height: 4px;
+  background: var(--accent);
+}
+
+.founder__sig {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.founder__sig .name {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-style: italic;
+  color: var(--navy);
+}
+.founder__sig .role {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+/* --- practice area cards with image plates ------------------------------- */
+
+.areas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr));
+  gap: 22px;
+}
+.area-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.area-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 20px 34px -28px rgba(14, 27, 44, 0.6);
+}
+.area-card__plate {
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(150deg, var(--navy-2), var(--navy));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-lift);
+  position: relative;
+}
+.area-card__plate img { width: 100%; height: 100%; object-fit: cover; }
+.area-card__plate svg { width: 48px; height: 48px; }
+.area-card__plate::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0; right: 0;
+  height: 3px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+.area-card:hover .area-card__plate::after { transform: scaleX(1); }
+.area-card__body { padding: 22px 24px 26px; display: flex; flex-direction: column; gap: 9px; flex: 1; }
+.area-card__body h3 { font-size: 1.2rem; }
+.area-card__body p { font-size: 0.93rem; color: var(--muted); }
+.area-card__body .card__more { color: var(--accent); }
+
+/* --- statistics band ----------------------------------------------------- */
+
+.stats {
+  background: var(--navy-2);
+  color: #fff;
+  padding-block: clamp(38px, 5vw, 58px);
+  border-block: 1px solid var(--navy-3);
+}
+.stats__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 30px;
+  text-align: center;
+}
+.stat__value {
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 1.5rem + 2.4vw, 3rem);
+  line-height: 1;
+  color: var(--accent-lift);
+  font-variant-numeric: tabular-nums;
+}
+.stat__label {
+  margin-top: 10px;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #A9B7C7;
+  font-weight: 700;
+}
+.stat__note { margin-top: 6px; font-size: 0.82rem; color: #8797A9; }
+
+/* --- testimonial carousel ------------------------------------------------ */
+
+.tcar { position: relative; }
+.tcar__viewport { overflow: hidden; }
+.tcar__track {
+  display: flex;
+  gap: 22px;
+  transition: transform 0.5s ease;
+  will-change: transform;
+}
+.tcar__item { flex: 0 0 100%; }
+@media (min-width: 700px)  { .tcar__item { flex-basis: calc((100% - 22px) / 2); } }
+@media (min-width: 1040px) { .tcar__item { flex-basis: calc((100% - 44px) / 3); } }
+
+.tcar__controls {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+.tcar__controls button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--rule-strong);
+  background: var(--surface);
+  border-radius: 2px;
+  cursor: pointer;
+  color: var(--navy);
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.tcar__controls button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.tcar__controls button:disabled { opacity: 0.4; cursor: default; }
+
+.quote__mark {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  line-height: 0.6;
+  color: var(--accent);
+  height: 22px;
+}
+.quote { height: 100%; }
+
+/* --- contact strip ------------------------------------------------------- */
+
+.callband {
+  background: var(--navy);
+  color: #fff;
+  padding-block: clamp(34px, 4.5vw, 52px);
+}
+.callband__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.callband h2 { color: #fff; font-size: var(--step-2); margin-bottom: 6px; }
+.callband p { color: #AEBBCA; font-size: 0.94rem; margin: 0; }
+.callband__phone {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.1rem);
+  color: var(--accent-lift);
+  text-decoration: none;
+  display: block;
+}
+.callband__phone:hover { color: #fff; }
+
+/* ==========================================================================
+   Motion — scroll reveal, header on scroll, parallax band
+   ========================================================================== */
+
+/* Elements rise into place once, as they enter the viewport. Nothing is hidden
+   until JavaScript confirms it can reveal them, so a JS failure leaves the page
+   fully readable rather than blank. */
+.js-reveal [data-reveal] {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+  will-change: opacity, transform;
+}
+.js-reveal [data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Children of a group stagger, so a grid assembles rather than snapping in. */
+.js-reveal [data-reveal-group] > * {
+  opacity: 0;
+  transform: translateY(26px);
+  transition: opacity 0.65s cubic-bezier(0.22, 0.61, 0.36, 1),
+              transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.js-reveal [data-reveal-group].is-in > * {
+  opacity: 1;
+  transform: none;
+}
+.js-reveal [data-reveal-group].is-in > *:nth-child(1) { transition-delay: 0.00s; }
+.js-reveal [data-reveal-group].is-in > *:nth-child(2) { transition-delay: 0.09s; }
+.js-reveal [data-reveal-group].is-in > *:nth-child(3) { transition-delay: 0.18s; }
+.js-reveal [data-reveal-group].is-in > *:nth-child(4) { transition-delay: 0.27s; }
+.js-reveal [data-reveal-group].is-in > *:nth-child(5) { transition-delay: 0.36s; }
+.js-reveal [data-reveal-group].is-in > *:nth-child(6) { transition-delay: 0.45s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal [data-reveal],
+  .js-reveal [data-reveal-group] > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Masthead condenses once the page is scrolled. */
+.masthead {
+  transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+.masthead.is-stuck {
+  box-shadow: 0 12px 28px -22px rgba(14, 27, 44, 0.65);
+}
+.masthead.is-stuck .masthead__bar { min-height: 62px; }
+.masthead__bar { transition: min-height 0.3s ease; }
+
+/* Parallax band — a fixed photographic plate the content scrolls over. */
+.parallax {
+  position: relative;
+  color: #fff;
+  overflow: hidden;
+  background: var(--navy);
+}
+.parallax__plate {
+  position: absolute;
+  inset: -12% 0;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+  z-index: 0;
+}
+.parallax__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgba(9, 18, 30, 0.9), rgba(9, 18, 30, 0.82));
+}
+.parallax > .shell { position: relative; z-index: 2; }
+.parallax h2 { color: #fff; }
+.parallax p { color: #B8C6D6; }
+
+/* Stats sit on the parallax plate, so their band loses its own background. */
+.stats.parallax { border-block: 0; }
+
+.stat__value[data-count] { font-variant-numeric: tabular-nums; }
+
+/* Section headings get a gold rule that draws itself on reveal. */
+.ruled { position: relative; padding-bottom: 14px; }
+.ruled::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 64px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.6s ease 0.2s;
+}
+.js-reveal [data-reveal].is-in .ruled::after,
+.ruled.is-in::after { transform: scaleX(1); }
+html:not(.js-reveal) .ruled::after { transform: scaleX(1); }
+
+/* Cards lift on hover across the site, not only in the areas grid. */
+.tile, .service {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.tile:hover, .service:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 22px 38px -30px rgba(14, 27, 44, 0.6);
+}
+
+/* --- scroll progress bar ------------------------------------------------- */
+
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  z-index: 60;
+  background: transparent;
+  pointer-events: none;
+}
+.progress__fill {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-lift));
+  transform: scaleX(0);
+  transform-origin: left;
+  will-change: transform;
+}
+
+/* --- hero content drifts and fades as the page scrolls past it ----------- */
+
+.heroc__inner, .hero > .shell {
+  will-change: transform, opacity;
+}
+
+/* --- back to top --------------------------------------------------------- */
+
+.totop {
+  position: fixed;
+  right: clamp(16px, 3vw, 30px);
+  bottom: clamp(16px, 3vw, 30px);
+  z-index: 45;
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 2px;
+  background: var(--navy);
+  color: var(--accent-lift);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(12px);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s, background-color 0.2s ease;
+  box-shadow: 0 14px 26px -16px rgba(14, 27, 44, 0.75);
+}
+.totop.is-shown { opacity: 1; visibility: visible; transform: none; }
+.totop:hover { background: var(--accent-deep); color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  .totop { transition: none; }
+}
+
+
+/* ==========================================================================
+   Home page to the client's approved design, 18 Aug 2026
+   Dark navy ground, gold accents, tiled practice areas.
+   Scoped to the new blocks so the rest of the site keeps its own palette.
+   ========================================================================== */
+
+/* Colours sampled from the approved design, kept separate from the site's own
+   palette so the two do not get confused. */
+:root {
+  --mock-ink:       #010B14;   /* hero and header ground */
+  /* Lifted from #09161E: the band behind it used to be near-white, so the card
+     only had to be dark to separate. Now the band is #0A121C too, and at the old
+     value the cards sat within a few points of it and read as flat. */
+  --mock-tile:      #121D2B;   /* practice area card */
+  --mock-band:      #0C1326;   /* about band */
+  /* Was #F0F0F0. Kept as its own tone rather than folded into --mock-ink or
+     --mock-band so the bands that use it (practice areas, courts strip, the
+     About page's split and memberships) still read as separate panels instead
+     of merging into the sections above and below them. */
+  --mock-light:     #0A121C;   /* the banded sections and courts strip */
+  --mock-gold:      #DCA955;   /* buttons, icons, rules */
+  --mock-gold-deep: #CFA055;   /* the display name */
+  --mock-white:     #F8F9F9;
+}
+
+.ico { width: 1.5em; height: 1.5em; display: block; }
+
+/* --- dark masthead ------------------------------------------------------- */
+.masthead--dark {
+  background: var(--mock-ink);
+  border-bottom: 1px solid rgba(220, 169, 85, 0.28);
+}
+.masthead--dark .brand__name { color: #fff; }
+.masthead--dark .brand__role { color: var(--mock-gold); }
+.masthead--dark .nav a { color: #DCE3EC; }
+.masthead--dark .nav a:hover,
+.masthead--dark .nav a[aria-current="page"] { color: var(--mock-gold); }
+.masthead--dark .nav__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: var(--mock-gold) !important;
+  border: 1px solid var(--mock-gold);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.82rem;
+}
+.masthead--dark .nav__cta .ico { width: 1.1em; height: 1.1em; flex: none; }
+.masthead--dark .nav__cta:hover {
+  background: var(--mock-gold);
+  color: var(--mock-ink) !important;
+  border-color: var(--mock-gold);
+}
+/* Filled instead of outlined marks the page you are already on - the outline
+   alone reads the same as the resting state otherwise. */
+.masthead--dark .nav__cta[aria-current="page"] {
+  background: var(--mock-gold);
+  color: var(--mock-ink) !important;
+  border-color: var(--mock-gold);
+}
+.masthead--dark .nav-toggle { color: #fff; border-color: rgba(255,255,255,0.4); }
+
+/* flex: none, or the masthead's space-between hands the nav the room it wants and
+   squeezes the brand until "JAVED SAYYED" breaks across two lines. The lockup is
+   fixed-size artwork plus a name; it is the nav that has to give way, and below
+   1200px it does - the hamburger takes over. */
+.brand--logo { display: flex; align-items: center; gap: 12px; flex: none; }
+.brand__stack > * { white-space: nowrap; }
+.logomark {
+  flex: none;
+  /* The emblem is fine detail - a column, a set of scales and two letterforms -
+     against a near-black bar. Below about 46px the scales close up into a blob,
+     so it is deliberately larger than the monogram it replaced. */
+  width: clamp(46px, 5.2vw, 64px);
+  height: auto;
+  color: var(--mock-gold);
+}
+/* Typeset to the wordmark in the client's logo artwork: ruled ADVOCATE, the
+   name in gold serif caps, then COUNSEL / ADVOCATE. */
+.brand__stack { display: grid; gap: 2px; line-height: 1.05; }
+/* The name is the one gold serif line in the artwork, and its weight is what
+   carries the mark - a sans here reads as a different brand beside the emblem. */
+.brand__line2 {
+  color: var(--mock-gold);
+  font-family: var(--font-display);
+  font-size: clamp(0.95rem, 0.78rem + 0.7vw, 1.32rem);
+  font-weight: 600; letter-spacing: 0.045em; text-transform: uppercase;
+}
+/* Both small lines are the artwork's near-white, not gold: gold on gold under
+   the name flattens the lockup. */
+/* Floor is 10px, not the 6.7px this used to bottom out at on a phone. Uppercase
+   micro-type at a quarter-em of tracking is already at the edge of legible; the
+   clamp's lower bound is what a 390px viewport actually gets, so that is the
+   number that has to be readable, not the 1440px one. */
+.brand__line3 {
+  color: #C9D2DC;
+  font-size: clamp(0.625rem, 0.55rem + 0.18vw, 0.7rem);
+  font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase;
+  text-align: center;
+}
+.brand__line3 i { color: var(--mock-gold); font-style: normal; margin: 0 0.45em; }
+/* "ADVOCATE" sits between two short rules in the artwork. */
+.brand__rolebar {
+  display: flex; align-items: center; gap: 7px;
+  color: var(--mock-gold);
+  font-size: clamp(0.625rem, 0.56rem + 0.2vw, 0.7rem);
+  font-weight: 600; letter-spacing: 0.24em; text-transform: uppercase;
+  margin-top: 2px;
+}
+.brand__rolebar--top {
+  color: #C9D2DC;
+  font-size: clamp(0.625rem, 0.55rem + 0.18vw, 0.7rem);
+  letter-spacing: 0.24em;
+  margin-top: 0;
+}
+.brand__rolebar::before,
+.brand__rolebar::after {
+  content: ""; height: 1px; flex: 1;
+  background: currentColor; opacity: 0.6;
+}
+/* The rules flanking the top line are gold in the artwork even though the word
+   itself is not. */
+.brand__rolebar--top::before,
+.brand__rolebar--top::after { background: var(--mock-gold); opacity: 0.75; }
+
+.nav__caret {
+  display: inline-block;
+  width: 0; height: 0;
+  margin-left: 5px;
+  vertical-align: 2px;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid currentColor;
+}
+
+/* --- hero ---------------------------------------------------------------- */
+.mhero {
+  position: relative;
+  background: var(--mock-ink);
+  overflow: hidden;
+  isolation: isolate;
+}
+.mhero__media {
+  position: absolute;
+  inset: auto 0 0 auto;
+  width: 46%;
+  max-width: 640px;
+  height: 92%;
+  z-index: 0;
+}
+.mhero__media img {
+  width: 100%; height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+/* The photograph runs under the text on narrow screens, so it is faded from the
+   left rather than cropped - the face stays visible, the words stay readable. */
+.mhero__media::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, var(--mock-ink) 0%, rgba(1,11,20,0.55) 14%, rgba(1,11,20,0) 34%);
+}
+/* padding-block, not the shorthand: .shell supplies the horizontal gutter and a
+   shorthand here would zero it, dropping the copy onto the left edge on any
+   viewport narrower than the shell. */
+.mhero__inner {
+  position: relative; z-index: 1;
+  padding-block: clamp(48px, 7vw, 104px) clamp(40px, 5vw, 72px);
+}
+.mhero__copy { max-width: 620px; }
+
+.mhero__eyebrow {
+  color: var(--mock-gold);
+  font-size: 0.72rem; font-weight: 700;
+  letter-spacing: 0.22em; text-transform: uppercase;
+  margin-bottom: 0.9rem;
+}
+.mhero__name {
+  display: grid;
+  font-size: clamp(2.1rem, 1.2rem + 4.2vw, 3.9rem);
+  line-height: 1.04;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: var(--mock-white);
+  font-weight: 700;
+}
+.mhero__name--gold { color: var(--mock-gold-deep); }
+.mhero__strap {
+  margin-top: 0.9rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 1rem + 0.9vw, 1.6rem);
+  color: #F2F5F8;
+}
+.mhero__rule {
+  display: block;
+  width: 58px; height: 2px;
+  background: var(--mock-gold);
+  margin: 1.2rem 0;
+}
+.mhero__lede { color: #B8C6D6; max-width: 46ch; margin-bottom: 1.8rem; }
+
+.btn--ghostgold {
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(220,169,85,0.75);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.78rem;
+}
+.btn--ghostgold:hover { background: var(--mock-gold); color: var(--mock-ink); border-color: var(--mock-gold); }
+
+.mstats {
+  list-style: none;
+  margin: clamp(28px, 4vw, 48px) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(18px, 3vw, 38px);
+}
+.mstats li {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding-right: clamp(18px, 3vw, 38px);
+  border-right: 1px solid rgba(255,255,255,0.14);
+}
+.mstats li:last-child { border-right: 0; padding-right: 0; }
+.mstats__ico { color: var(--mock-gold); }
+.mstats__ico .ico { width: 1.9em; height: 1.9em; }
+.mstats strong { display: block; color: #fff; font-size: 1.05rem; }
+.mstats__label { display: block; color: #fff; font-size: 0.95rem; font-weight: 600; }
+.mstats__sub { display: block; color: #93A3B6; font-size: 0.8rem; }
+
+/* --- practice area tiles -------------------------------------------------- */
+.areaband {
+  position: relative;
+  overflow: hidden;
+  background: var(--mock-light);
+  padding: clamp(52px, 7vw, 92px) 0 clamp(56px, 7vw, 96px);
+  text-align: center;
+}
+.areaband > .shell { position: relative; z-index: 1; }
+/* The base eyebrow draws a rule to its right with ::after. Centred over a
+   section heading it needs no rule at all, only the label. */
+/* Paragraphs carry a max-width for readability, which leaves a centred eyebrow
+   sitting inside a narrower box than the heading above it - hence the auto
+   margins as well as the centred flex content. */
+.eyebrow--center { justify-content: center; color: var(--accent-deep); margin-inline: auto; }
+.eyebrow--center::after { display: none; }
+.areaband__head {
+  font-size: clamp(1.6rem, 1.3rem + 1.4vw, 2.3rem);
+  margin-top: 0.4rem;
+}
+.areaband__orn {
+  display: block;
+  width: 190px; height: 1px;
+  margin: 1.1rem auto clamp(30px, 4vw, 48px);
+  background: linear-gradient(90deg, transparent, var(--accent) 22%, var(--accent) 78%, transparent);
+  position: relative;
+}
+.areaband__orn::after {
+  content: "";
+  position: absolute; left: 50%; top: 50%;
+  width: 7px; height: 7px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: var(--accent);
+}
+
+.tilegrid {
+  list-style: none; margin: 0; padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(12px, 1.4vw, 20px);
+  text-align: center;
+}
+.tile2 {
+  background: var(--mock-tile);
+  border: 1px solid rgba(220,169,85,0.16);
+  padding: clamp(18px, 2vw, 26px) clamp(12px, 1.4vw, 18px) clamp(16px, 2vw, 22px);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  transition: transform 0.35s ease, border-color 0.35s ease, background 0.35s ease;
+}
+.tile2:hover { transform: translateY(-4px); border-color: rgba(220,169,85,0.55); background: #0C1B25; }
+.tile2__ico { color: var(--mock-gold); margin-bottom: 2px; }
+.tile2__ico .ico { width: 2.3em; height: 2.3em; }
+.tile2 h3 {
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.tile2 p { color: #A9B8C9; font-size: 0.8rem; line-height: 1.5; margin: 0; }
+.tile2 a {
+  margin-top: auto;
+  color: var(--mock-gold);
+  font-size: 0.76rem; font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  text-decoration: none;
+}
+.tile2 a:hover { color: #fff; text-decoration: underline; }
+.tile2__nolink { margin-top: auto; font-size: 0.76rem; }
+
+/* --- about band ----------------------------------------------------------- */
+.aboutband {
+  background: var(--mock-band);
+  position: relative;
+  overflow: hidden;
+}
+/* The design sets the About band against a dark colonnade on the right. This is
+   the courthouse-columns photograph the Criminal Litigation page used to carry,
+   faded into the band so it reads as depth rather than as a picture. */
+.aboutband::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 58%;
+  background-image:
+    linear-gradient(90deg, var(--mock-band) 0%, rgba(12,19,38,0.92) 22%, rgba(12,19,38,0.55) 58%, rgba(12,19,38,0.7) 100%),
+    url("/img/colonnade.webp");
+  background-size: cover, cover;
+  background-position: center, 60% 40%;
+  filter: saturate(0.35) brightness(0.55);
+  pointer-events: none;
+}
+.aboutband__grid { position: relative; z-index: 1; }
+.aboutband__grid {
+  max-width: var(--shell);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: center;
+}
+.aboutband__portrait { align-self: end; position: relative; }
+
+.aboutband__portrait img {
+  width: 100%; height: auto; display: block;
+  max-height: 400px; object-fit: contain; object-position: bottom center;
+}
+.aboutband__copy { padding: clamp(40px, 5vw, 68px) 0; }
+/* The design shows the ABOUT label on its own; the base eyebrow rule would run
+   a line across the band. */
+.aboutband__copy .eyebrow { color: var(--mock-gold); }
+.aboutband__copy .eyebrow::after { display: none; }
+.aboutband__copy .eyebrow::before { background: var(--mock-gold); }
+.aboutband__copy h2 {
+  color: #fff;
+  font-size: clamp(1.5rem, 1.2rem + 1.3vw, 2.1rem);
+  margin-bottom: 1rem;
+}
+.aboutband__copy p { color: #B8C6D6; margin-bottom: 0.9rem; max-width: 60ch; }
+.aboutband__copy .btn { margin-top: 0.8rem; }
+/* Phone-only additions - the ornament, the roles line and the credentials list
+   are set out in the 620px block near the foot of this file. Above that width
+   the band keeps the approved two-column design, so they stay out of it. The
+   .aboutband__body / .aboutband__text wrappers around the paragraphs are left
+   as plain blocks here, which is why the copy still flows exactly as before.
+
+   Qualified with .aboutband__copy so this outranks the shared `.orn` rule
+   further down the file, which sets display: block and would otherwise win on
+   source order and leave the ornament showing on desktop. */
+.aboutband__copy .aboutband__orn,
+.aboutband__copy .aboutband__roles,
+.aboutband__copy .aboutband__creds,
+.aboutband__copy .aboutband__seal { display: none; }
+/* Same for the label above the photograph. It is a grid child, so hiding it
+   also keeps it out of the desktop grid's auto-placement entirely. */
+.aboutband__grid .aboutband__label { display: none; }
+/* Inherits on desktop, so the name renders exactly as the plain h2 did. */
+.aboutband__namepre { color: inherit; }
+
+/* --- courts strip --------------------------------------------------------- */
+.courtstrip {
+  background: var(--mock-light);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.courtstrip__inner {
+  list-style: none; margin: 0 auto; padding: clamp(20px, 2.6vw, 30px) var(--gutter);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(12px, 1.8vw, 26px);
+}
+.courtstrip__inner li {
+  display: flex; align-items: center; gap: 14px;
+  padding-right: clamp(16px, 2.4vw, 34px);
+  border-right: 1px solid var(--rule);
+}
+.courtstrip__inner li:last-child { border-right: 0; }
+.courtstrip__ico { color: var(--ink); flex: none; }
+.courtstrip__ico .ico { width: 2.1em; height: 2.1em; }
+/* Court names are long. A slightly tighter size keeps each on one line, as the
+   design has them, instead of wrapping mid-name. */
+.courtstrip__inner strong { display: block; font-size: 0.82rem; letter-spacing: 0.01em; text-transform: uppercase; }
+.courtstrip__inner span span { color: var(--muted); font-size: 0.82rem; }
+
+/* --- responsive ----------------------------------------------------------- */
+/* Ten tiles: five and two columns divide evenly, four leaves a tidy pair on the
+   last row. Three would leave a single tile stranded, so that step is skipped. */
+@media (max-width: 1040px) {
+  .tilegrid { grid-template-columns: repeat(4, 1fr); }
+  .courtstrip__inner { grid-template-columns: repeat(2, 1fr); }
+  .courtstrip__inner li:nth-child(2) { border-right: 0; }
+}
+@media (max-width: 860px) {
+  /* Side-by-side hero kept at phone widths too, per the client's mockup: the
+     photograph stays anchored bottom-right in the same fold as the copy,
+     faded in from the left, rather than pushed beneath it. */
+  .mhero__inner { padding-block: clamp(34px, 8vw, 52px) clamp(20px, 4vw, 28px); }
+  /* Only the eyebrow/name/strap sit beside the photograph, so only those are
+     capped to keep clear of it - the lede, button and stats run the full
+     column width, passing below the photograph's left edge. */
+  /* Everything in the left-hand column is capped so it clears the figure - the
+     button included. A full-width button ran underneath the lectern, which is
+     why it read as a collision rather than a layout. */
+  .mhero__eyebrow, .mhero__name, .mhero__strap, .mhero__lede { max-width: 52%; }
+  .mhero .btn--ghostgold { width: auto; max-width: 52%; }
+  /* The photograph sits top-right, beside the eyebrow and the name - the panel
+     the mockup puts there, and the space that was previously left empty.
+
+     Sizing and fit are settled once, in the second 860px block further down
+     (search .mhero__media there); it is written after this one and wins on
+     source order. Nothing here may set inset, width, height, aspect-ratio,
+     object-fit or object-position, or the two blocks disagree silently. */
+  /* No left-hand wash at this size: the copy is already clear of the figure, and
+     the gradient only muddied the lectern. */
+  .mhero__media::after { display: none; }
+  .aboutband__grid { grid-template-columns: 1fr; }
+  .aboutband__portrait { align-self: auto; padding-top: clamp(28px, 5vw, 44px); }
+  .aboutband__portrait img { max-height: 320px; }
+}
+@media (max-width: 760px) {
+  .tilegrid { grid-template-columns: repeat(2, 1fr); }
+  .mstats li { border-right: 0; padding-right: 0; flex-basis: 100%; }
+  .courtstrip__inner { grid-template-columns: repeat(2, 1fr); row-gap: 18px; }
+  .courtstrip__inner li:nth-child(2n) { border-right: 0; padding-right: 0; }
+  .courtstrip__inner strong { font-size: 0.74rem; }
+}
+
+
+/* ==========================================================================
+   About page to the client's PDF design, 19 Aug 2026
+   Same sampled palette as the home page.
+   ========================================================================== */
+
+/* Hairline with a lozenge at its centre, used under several headings. */
+.orn {
+  display: block;
+  width: 210px; height: 1px;
+  margin: 1.1rem 0 1.2rem;
+  background: linear-gradient(90deg, transparent, currentColor 20%, currentColor 80%, transparent);
+  color: var(--rule-strong);
+  position: relative;
+}
+.orn::after {
+  content: "";
+  position: absolute; left: 50%; top: 50%;
+  width: 7px; height: 7px;
+  transform: translate(-50%, -50%) rotate(45deg);
+  background: currentColor;
+}
+.orn--gold { color: var(--mock-gold); margin-inline: auto; }
+
+/* --- hero ---------------------------------------------------------------- */
+.ahero {
+  position: relative;
+  background: var(--mock-ink);
+  overflow: hidden;
+  isolation: isolate;
+  /* ASPECT CONTRACT - read before changing this or .ahero__photo's width.
+     The hero artwork is 1.383:1 (w/h). `cover` crops vertically as soon as the
+     photo box is WIDER than that ratio, and the artwork has almost no headroom
+     above the advocate, so a vertical crop takes his head off. Keeping
+     height = 41.6% of width against a photo box of 57.5% width gives a box
+     ratio of 0.575 / 0.416 = 1.383 - exactly the artwork - at every viewport
+     width. Both caps below are chosen to stay UNDER that ratio, never over. */
+  min-height: clamp(430px, 41.6vw, 780px);
+}
+/* The photograph keeps its own room - the panelling and the painting are what
+   give the frame its depth in the design - and is faded into the ground from the
+   left so the copy always sits on flat colour. */
+/* 57.5% is half of the aspect contract above - the artwork's own share of the
+   design's band. max-width pairs with the band's max-height so that on very
+   wide screens the box ratio falls BELOW 1.383 (safe, crops the sides) rather
+   than above it (crops his head). */
+.ahero__photo {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 57.5%;
+  max-width: 1060px;
+  z-index: 0;
+}
+.ahero__photo img {
+  width: 100%; height: 100%;
+  /* Top-anchored purely as insurance: if a future change does break the aspect
+     contract, the crop eats the floor at the bottom instead of his head. */
+  object-fit: cover; object-position: 50% 0%;
+}
+.ahero__photo::after {
+  content: "";
+  position: absolute; inset: 0;
+  background:
+    /* The artwork is cut just left of the brass scales, so its left edge is a
+       hard line through them. This fade is what hides that edge - it must stay
+       opaque over the first few percent and be clear well before the advocate
+       begins, around 30% of the box. */
+    linear-gradient(90deg,
+      var(--mock-ink) 0%,
+      rgba(1,11,20,0.9) 4%,
+      rgba(1,11,20,0.45) 10%,
+      rgba(1,11,20,0.12) 17%,
+      rgba(1,11,20,0) 24%);
+}
+.ahero__inner {
+  position: relative; z-index: 1;
+  padding-block: clamp(46px, 6.5vw, 96px) clamp(42px, 5.5vw, 80px);
+}
+/* Was capped at 3.5rem, which put 56px of display type over 15px of body copy
+   on a 1440 viewport - a jump big enough that the heading read as the whole
+   band and the paragraphs under it as a caption. 2.9rem keeps the heading
+   dominant without swamping what it introduces. The phone sizes are set in the
+   narrow-viewport block further down and are unchanged. */
+.ahero__title {
+  display: grid;
+  color: var(--mock-white);
+  font-size: clamp(1.85rem, 1.15rem + 3vw, 2.9rem);
+  line-height: 1.06;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+.ahero__title--gold { color: var(--mock-gold-deep); }
+.ahero .orn { color: rgba(220,169,85,0.55); }
+.ahero__strap {
+  color: var(--mock-gold);
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 0.88rem + 0.6vw, 1.22rem);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-bottom: 1.2rem;
+}
+/* Set explicitly rather than inherited: the intro runs to four paragraphs on the
+   About page, and at the inherited size and a 0.4rem gap they packed into a
+   slab. The phone block further down already sets 1rem/1.68 for the same
+   reason. */
+.ahero__copy p {
+  color: #C3CFDC;
+  max-width: 46ch;
+  margin-bottom: 0.75rem;
+  font-size: 0.98rem;
+  line-height: 1.72;
+}
+.ahero__copy p:last-child { margin-bottom: 0; }
+
+/* --- engagements listed inside the hero ---------------------------------- */
+/* The Achievements page carries its entries here instead of in the separate
+   recognition band, which repeated the page's own h1 below it and left this
+   column empty from the strap down.
+
+   Self-contained on purpose: it reads like the old band (gold ring, display
+   title, muted body) but borrows none of its rules, so the .recog block can be
+   retired without taking the hero with it.
+
+   The measure is a little under .ahero__copy's 46ch because these lines start
+   past the icon: the photograph's box begins at 42.5% of the viewport, and a
+   full 46ch of text plus a 42px ring would reach under it. */
+.ahero__wins {
+  list-style: none;
+  margin: clamp(20px, 2.8vw, 32px) 0 0;
+  padding: 0;
+  display: grid;
+  gap: clamp(14px, 1.8vw, 20px);
+  max-width: 44ch;
+}
+.ahero__wins li { display: flex; gap: 14px; align-items: flex-start; }
+.ahero__wico {
+  flex: none;
+  width: 42px; height: 42px;
+  display: grid; place-items: center;
+  border: 1px solid rgba(220, 169, 85, 0.5);
+  border-radius: 50%;
+  color: var(--mock-gold);
+}
+.ahero__wico .ico { width: 1.5em; height: 1.5em; }
+.ahero__wins strong {
+  display: block;
+  color: var(--mock-white);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 3px;
+}
+.ahero__wins li span span { color: #A9B8C9; font-size: 0.88rem; line-height: 1.55; }
+.ahero__note {
+  margin-top: clamp(16px, 2.2vw, 24px);
+  max-width: 44ch;
+  color: #8FA0B3;
+  font-size: 0.82rem;
+  font-style: italic;
+}
+
+/* --- about the advocate, and the areas card ------------------------------ */
+.asplit { background: var(--mock-light); }
+.asplit__grid {
+  display: grid;
+  /* The expertise card runs noticeably wider than the About column in the
+     approved design, not near-equal columns. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: clamp(26px, 3.6vw, 56px);
+  /* stretch, not start: the About copy runs to several paragraphs and is
+     reliably the taller column, so a shorter expertise list left `start`
+     would end well above it, stranding a slab of bare background beside the
+     card instead of inside its own border. */
+  align-items: stretch;
+}
+.asplit__head {
+  display: flex; align-items: center; gap: 12px;
+  font-size: clamp(1.25rem, 1.1rem + 0.8vw, 1.6rem);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 1.3rem;
+}
+.asplit__ico { color: var(--accent); }
+.asplit__ico .ico { width: 1.9em; height: 1.9em; }
+.asplit p { margin-bottom: 0.85rem; font-size: 0.94rem; }
+
+.expertise {
+  border: 1px solid var(--rule-strong);
+  border-radius: 4px;
+  /* Was a hardcoded #FBFBFA, which stayed white when the palette went dark. */
+  background: var(--surface);
+  padding: clamp(20px, 2.4vw, 30px) clamp(16px, 2vw, 26px);
+  /* Now that the card is stretched to the About column's height, center the
+     heading+list as a block in that height rather than pinning them to the
+     top and leaving all the extra room stranded below the last row. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.expertise__head {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.35rem);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin-bottom: clamp(16px, 2vw, 24px);
+}
+.expertise__hico { color: var(--accent); }
+.expertise__hico .ico { width: 1.6em; height: 1.6em; }
+.expertise ul {
+  list-style: none; margin: 0; padding: 0;
+  display: grid;
+  /* Column-wise, as the design orders them: the first five run down the left,
+     the second five down the right. Row-wise flow would interleave the two. */
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-rows: repeat(5, auto);
+  grid-auto-flow: column;
+  gap: clamp(12px, 1.6vw, 18px) clamp(14px, 2vw, 26px);
+}
+.expertise li { display: flex; align-items: flex-start; gap: 11px; }
+/* A hairline between the two columns, one segment per row rather than a single
+   rule down the whole card - matches the approved design, where the divider
+   breaks at each row instead of running edge to edge. */
+.expertise li:nth-child(n+6) {
+  border-left: 1px solid var(--rule-strong);
+  padding-left: clamp(14px, 2vw, 26px);
+  margin-left: clamp(-8px, -1vw, -4px);
+}
+.expertise__ico {
+  flex: none;
+  width: 34px; height: 34px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--mock-ink);
+  color: var(--mock-gold);
+}
+.expertise__ico .ico { width: 1.15em; height: 1.15em; }
+/* Raster artwork sits where the inline glyph would, at the same optical size. */
+.expertise__ico img { width: 1.35em; height: 1.35em; object-fit: contain; }
+.expertise li a,
+.expertise li > span:last-child {
+  font-size: 0.88rem;
+  line-height: 1.35;
+  color: var(--ink);
+}
+.expertise li a { text-decoration: none; }
+.expertise li a:hover { color: var(--accent-deep); text-decoration: underline; }
+
+/* --- courts of practice -------------------------------------------------- */
+.courts {
+  background: var(--mock-ink);
+  padding: clamp(34px, 4.4vw, 58px) 0 clamp(34px, 4.4vw, 56px);
+  text-align: center;
+}
+.courts__head {
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+  color: var(--mock-gold);
+  font-size: clamp(1.1rem, 0.95rem + 0.7vw, 1.4rem);
+  text-transform: uppercase; letter-spacing: 0.07em;
+  margin-bottom: clamp(22px, 3vw, 34px);
+}
+.courts__head span { color: var(--mock-gold); }
+.courts__head .ico { width: 1.5em; height: 1.5em; }
+.courts__grid {
+  list-style: none; margin: 0; padding: 0;
+  display: grid;
+  /* Six then four, as in the design. */
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(18px, 2.4vw, 28px) 0;
+}
+.courts__grid li {
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+  padding-inline: clamp(8px, 1.4vw, 18px);
+  border-right: 1px solid rgba(255,255,255,0.14);
+  color: #DCE3EC;
+  font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  line-height: 1.4;
+}
+.courts__grid li:last-child { border-right: 0; }
+.courts__ico { color: var(--mock-gold); }
+.courts__ico .ico { width: 1.8em; height: 1.8em; }
+
+/* --- memberships --------------------------------------------------------- */
+.members { background: var(--mock-light); text-align: center; }
+.members__head {
+  font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.35rem);
+  text-transform: uppercase; letter-spacing: 0.05em;
+  margin-bottom: clamp(24px, 3vw, 36px);
+  position: relative;
+}
+.members__grid {
+  list-style: none; margin: 0 0 clamp(20px, 2.6vw, 30px); padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+  gap: clamp(18px, 2.2vw, 26px) 0;
+}
+.members__grid li {
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  padding-inline: clamp(6px, 1vw, 14px);
+  border-right: 1px solid var(--rule);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--ink);
+}
+.members__grid li:last-child { border-right: 0; }
+.members__ico {
+  width: 58px; height: 58px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  background: var(--mock-ink);
+  color: var(--mock-gold);
+}
+.members__ico .ico { width: 1.8em; height: 1.8em; }
+/* The image already contains the dark disc and its gold rim, so it must not
+   also get the CSS circle behind it - two discs at slightly different radii
+   leave a visible ring of the wrong colour at the edge. */
+.members__ico--img {
+  background: none;
+  display: block;
+  object-fit: contain;
+  flex: none;
+}
+.members__note {
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  max-width: 68ch;
+  margin: 0 auto;
+}
+
+/* --- core values and closing line ---------------------------------------- */
+.corevals {
+  background: var(--mock-ink);
+  padding: clamp(34px, 4.4vw, 56px) 0 clamp(28px, 3.6vw, 46px);
+  text-align: center;
+}
+.corevals__head {
+  color: var(--mock-gold);
+  font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.3rem);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin-bottom: clamp(22px, 3vw, 32px);
+}
+.corevals__grid {
+  list-style: none; margin: 0 0 clamp(24px, 3vw, 36px); padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: clamp(18px, 2.2vw, 26px) 0;
+}
+.corevals__grid li {
+  padding-inline: clamp(10px, 1.6vw, 22px);
+  border-right: 1px solid rgba(255,255,255,0.14);
+}
+.corevals__grid li:last-child { border-right: 0; }
+.corevals__ico { display: block; color: var(--mock-gold); margin: 0 auto 10px; width: fit-content; }
+.corevals__ico .ico { width: 2.2em; height: 2.2em; }
+.corevals__grid strong {
+  display: block;
+  color: var(--mock-white);
+  font-size: 0.82rem; letter-spacing: 0.09em; text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.corevals__grid p { color: #9FAFC0; font-size: 0.8rem; line-height: 1.5; margin: 0 auto; max-width: 24ch; }
+
+.arearow__quote {
+  border: 1px solid rgba(220,169,85,0.45);
+  padding: clamp(12px, 1.6vw, 18px) clamp(16px, 2.4vw, 30px);
+  color: var(--mock-white);
+  font-family: var(--font-display);
+  font-size: clamp(0.88rem, 0.8rem + 0.45vw, 1.12rem);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.arearow__quote span { color: var(--mock-gold); }
+
+/* --- responsive ---------------------------------------------------------- */
+@media (max-width: 980px) {
+  .asplit__grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+  /* Stacked, not layered: behind the copy the painting and the suit cut through
+     the heading, and no amount of scrim fixes that without losing the photograph. */
+  /* Stacked: the photograph gets its own block below the copy, so the desktop
+     band's absolute-positioned strip no longer applies. Its height comes from
+     `aspect-ratio`, not a fixed clamp, matching the same 1.383:1 the photo was
+     cropped to - the client wants this exact photo on mobile too rather than a
+     swapped-in cutout, and matching the box ratio to the photo's own ratio
+     means `cover` still has nothing to crop, at any phone width, instead of
+     eating into the pose the way a shorter fixed-height box would. */
+  .ahero { display: flex; flex-direction: column; min-height: 0; }
+  .ahero__inner { order: 1; }
+  .ahero__photo {
+    order: 2;
+    position: relative;
+    inset: auto;
+    width: 100%;
+    aspect-ratio: 1.3825;
+  }
+  .ahero__photo::after {
+    background: linear-gradient(180deg, rgba(1,11,20,0.14) 0%, rgba(1,11,20,0) 42%, rgba(1,11,20,0.5) 100%);
+  }
+  .ahero__copy p { max-width: none; }
+}
+@media (max-width: 1000px) {
+  .courts__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .courts__grid li:nth-child(3n) { border-right: 0; }
+  .members__grid li:nth-child(4n) { border-right: 0; }
+}
+@media (max-width: 620px) {
+  .expertise ul { grid-template-columns: 1fr; grid-template-rows: none; grid-auto-flow: row; }
+  /* Single column now, so the column divider would just be a stray mark on
+     the left of five items. */
+  .expertise li:nth-child(n+6) { border-left: 0; padding-left: 0; margin-left: 0; }
+  .courts__grid,
+  .members__grid,
+  .corevals__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .courts__grid li:nth-child(2n),
+  .members__grid li:nth-child(2n),
+  .corevals__grid li:nth-child(2n) { border-right: 0; }
+  .corevals__grid p { max-width: none; }
+}
+
+
+/* ==========================================================================
+   Mobile presentation of the dark design
+   The desktop composition does not survive at 390px, so these rules give the
+   same design a layout built for a phone: same palette, same type, same
+   content and order, arranged for one narrow column.
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+  /* The panel is part of the dark header, not a white sheet under it. */
+  .masthead--dark .nav {
+    background: var(--mock-ink);
+    border-bottom: 1px solid rgba(220, 169, 85, 0.3);
+    box-shadow: 0 18px 30px -20px rgba(0, 0, 0, 0.8);
+    padding-bottom: 16px;
+  }
+  .masthead--dark .nav a {
+    color: #E6ECF3;
+    font-size: 1rem;
+    padding: 14px 2px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .masthead--dark .nav a:last-of-type { border-bottom: 0; }
+  .masthead--dark .nav a[aria-current="page"] {
+    color: var(--mock-gold);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  .masthead--dark .nav__cta {
+    margin: 14px 0 0;
+    text-align: center;
+    padding: 14px 16px !important;
+    border-bottom: 0 !important;
+    color: var(--mock-ink) !important;
+    font-size: 0.95rem;
+    letter-spacing: 0.04em;
+  }
+  .masthead--dark .nav__caret { display: none; }
+}
+
+@media (max-width: 760px) {
+  /* --- hero ------------------------------------------------------------- */
+  /* Tighter than the desktop rhythm: on a phone the same padding reads as dead
+     space, and the first call to action should be reachable without scrolling
+     twice. */
+  .mhero__inner { padding-block: clamp(30px, 7vw, 44px) clamp(18px, 4vw, 26px); }
+  .mhero__name { font-size: clamp(1.95rem, 1.2rem + 5.4vw, 2.6rem); }
+  .mhero__strap { font-size: clamp(1.05rem, 0.95rem + 1.4vw, 1.3rem); margin-top: 0.7rem; }
+  .mhero__rule { margin: 0.9rem 0; }
+  .mhero__lede { font-size: 0.95rem; margin-bottom: 1.4rem; }
+  .btn--ghostgold { width: 100%; text-align: center; }
+
+  /* Three columns stay in a single row, as in the mockup, just narrower. */
+  .mstats { gap: 8px; margin-top: 24px; flex-wrap: nowrap; }
+  .mstats li { flex: 1 1 0; padding-right: 8px; gap: 8px; }
+  .mstats li:last-child { border-right: 0; padding-right: 0; }
+  .mstats__ico .ico { width: 1.5em; height: 1.5em; }
+  .mstats strong, .mstats__label { font-size: 0.82rem; }
+  .mstats__sub { font-size: 0.7rem; }
+
+  /* --- practice area tiles ---------------------------------------------- */
+  .areaband { padding: clamp(38px, 9vw, 56px) 0; }
+  .areaband__head { font-size: clamp(1.35rem, 1.1rem + 2.4vw, 1.8rem); }
+  .areaband__orn { width: 150px; margin-bottom: 26px; }
+  .tilegrid { gap: 10px; }
+  .tile2 {
+    padding: 18px 12px 16px;
+    justify-content: flex-start;
+  }
+  .tile2 h3 { font-size: 0.9rem; }
+  .tile2 p { font-size: 0.76rem; }
+  .tile2 a { margin-top: auto; padding-top: 12px; font-size: 0.7rem; }
+
+  /* --- about band ------------------------------------------------------- */
+  /* The colonnade wash covered the copy once the columns stacked. It now sits
+     behind the portrait half only. */
+  .aboutband::before { width: 100%; height: 46%; inset: 0 0 auto 0; }
+  .aboutband__grid { gap: 0; }
+  .aboutband__portrait { padding-top: clamp(24px, 6vw, 36px); }
+  .aboutband__portrait img { max-height: 300px; }
+  .aboutband__copy { padding-block: clamp(26px, 6vw, 40px) clamp(30px, 7vw, 44px); }
+  .aboutband__copy h2 { font-size: clamp(1.3rem, 1.1rem + 2vw, 1.7rem); }
+  .aboutband__copy p { font-size: 0.95rem; }
+  .aboutband__copy .btn { width: 100%; text-align: center; }
+
+  /* --- courts strip ----------------------------------------------------- */
+  .courtstrip__inner { padding-block: 22px; }
+  .courtstrip__ico .ico { width: 1.8em; height: 1.8em; }
+}
+
+/* --- About page on a phone ---------------------------------------------- */
+@media (max-width: 760px) {
+  .ahero__inner { padding-block: clamp(32px, 8vw, 48px) clamp(26px, 6vw, 40px); }
+  .ahero__title { font-size: clamp(1.9rem, 1.2rem + 5vw, 2.6rem); }
+  .ahero__strap { font-size: clamp(0.95rem, 0.88rem + 1vw, 1.15rem); }
+  .ahero .orn { width: 150px; }
+  .ahero__copy p { font-size: 0.95rem; }
+
+  .asplit__head { font-size: clamp(1.15rem, 1rem + 1.8vw, 1.45rem); }
+  .asplit p { font-size: 0.93rem; }
+  .expertise { padding: 20px 16px; }
+  .expertise__head { font-size: 1.05rem; }
+  .expertise li a,
+  .expertise li > span:last-child { font-size: 0.9rem; }
+
+  .courts { padding: clamp(32px, 8vw, 48px) 0; }
+  .courts__head { font-size: 1.1rem; margin-bottom: 22px; }
+  .courts__grid { gap: 20px 0; }
+  .courts__grid li { font-size: 0.68rem; }
+
+  .members { padding-block: clamp(34px, 8vw, 50px); }
+  .members__head { font-size: 1.05rem; line-height: 1.4; margin-bottom: 26px; }
+  .members__grid { gap: 20px 0; }
+  .members__ico { width: 50px; height: 50px; }
+  .members__grid li { font-size: 0.74rem; }
+  .members__note { font-size: 0.88rem; }
+
+  .corevals { padding: clamp(32px, 8vw, 48px) 0 clamp(26px, 6vw, 38px); }
+  .corevals__head { font-size: 1.05rem; margin-bottom: 24px; }
+  .corevals__grid { gap: 22px 0; }
+  .corevals__ico .ico { width: 2em; height: 2em; }
+  .arearow__quote {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    padding: 14px 16px;
+  }
+}
+
+
+/* --- footer on smaller screens -------------------------------------------- */
+@media (max-width: 1000px) {
+  .footer__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 28px;
+  }
+  /* The intro paragraph spans both columns rather than squeezing the lists. */
+  .footer__grid > div:first-child { grid-column: 1 / -1; }
+}
+
+@media (max-width: 700px) {
+  .footer { padding-block: clamp(34px, 8vw, 48px) 24px; }
+  .footer__grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .footer p { max-width: none; }
+  /* Links are the only tappable things down here, so they get real height
+     rather than the 9px gap the desktop layout uses. */
+  .footer ul { gap: 2px; }
+  .footer li { line-height: 1.4; }
+  .footer ul a {
+    display: block;
+    padding: 9px 0;
+  }
+  .footer__legal-note { font-size: 0.8rem; padding: 14px 14px; }
+  .footer__bar {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 26px;
+    font-size: 0.78rem;
+  }
+}
+
+
+/* ==========================================================================
+   Mobile typography and imagery pass
+   Type on a phone needs more size and more air than a straight scale-down of
+   the desktop values gives it; the photographs need a little more height to
+   carry any weight in a single column.
+   ========================================================================== */
+
+@media (max-width: 760px) {
+  /* --- body copy ---------------------------------------------------------- */
+  /* Slightly looser lines and a touch more space between paragraphs: the single
+     narrow column is what the reader is following down the whole page. */
+  body { line-height: 1.72; }
+  p { margin-bottom: 1.05rem; }
+
+  /* --- home hero ---------------------------------------------------------- */
+  .mhero__eyebrow { font-size: 0.68rem; letter-spacing: 0.18em; margin-bottom: 1rem; }
+  .mhero__name {
+    font-size: clamp(2.15rem, 1.15rem + 6.2vw, 2.95rem);
+    line-height: 1.02;
+    letter-spacing: 0.005em;
+  }
+  .mhero__strap { font-size: clamp(1.12rem, 0.98rem + 1.7vw, 1.42rem); line-height: 1.3; }
+  .mhero__lede { font-size: 1rem; line-height: 1.68; }
+  .btn--ghostgold { font-size: 0.8rem; padding-block: 15px; letter-spacing: 0.09em; }
+
+  /* Photograph stays side-by-side with the copy (see the 860px block); no
+     extra height override needed here. */
+
+  /* --- section headings --------------------------------------------------- */
+  .areaband__head,
+  .aboutband__copy h2,
+  .asplit__head {
+    font-size: clamp(1.5rem, 1.15rem + 2.9vw, 2rem);
+    line-height: 1.16;
+  }
+  .courts__head,
+  .members__head,
+  .corevals__head,
+  .expertise__head {
+    font-size: clamp(1.12rem, 1rem + 1.3vw, 1.34rem);
+    letter-spacing: 0.06em;
+    line-height: 1.35;
+  }
+  .eyebrow, .eyebrow--center { font-size: 0.68rem; letter-spacing: 0.18em; }
+
+  /* --- practice area tiles ------------------------------------------------ */
+  .tile2 { padding: 22px 13px 18px; gap: 9px; }
+  .tile2__ico .ico { width: 2.5em; height: 2.5em; }
+  .tile2 h3 { font-size: 0.97rem; line-height: 1.28; }
+  .tile2 p { font-size: 0.82rem; line-height: 1.5; }
+  .tile2 a { font-size: 0.73rem; margin-top: auto; padding-top: 14px; }
+
+  /* --- about band --------------------------------------------------------- */
+  .aboutband__portrait img { max-height: 340px; }
+  .aboutband__copy p { font-size: 1rem; line-height: 1.68; }
+
+  /* --- courts strip on the home page -------------------------------------- */
+  .courtstrip__inner strong { font-size: 0.78rem; }
+  .courtstrip__inner span span { font-size: 0.8rem; }
+
+  /* --- about page --------------------------------------------------------- */
+  .ahero__title {
+    font-size: clamp(2.05rem, 1.15rem + 5.8vw, 2.85rem);
+    line-height: 1.03;
+  }
+  .ahero__strap { font-size: clamp(1rem, 0.9rem + 1.2vw, 1.2rem); line-height: 1.35; }
+  .ahero__copy p { font-size: 1rem; line-height: 1.68; }
+  .asplit p { font-size: 0.98rem; line-height: 1.7; }
+
+  .expertise { padding: 22px 18px; }
+  .expertise li { gap: 13px; align-items: center; }
+  .expertise__ico { width: 38px; height: 38px; }
+  .expertise__ico .ico { width: 1.25em; height: 1.25em; }
+  .expertise li a,
+  .expertise li > span:last-child { font-size: 0.95rem; line-height: 1.4; }
+
+  .courts__grid li { font-size: 0.72rem; letter-spacing: 0.04em; }
+  .courts__ico .ico { width: 2em; height: 2em; }
+
+  .members__ico { width: 56px; height: 56px; }
+  .members__ico .ico { width: 1.9em; height: 1.9em; }
+  .members__grid li { font-size: 0.78rem; line-height: 1.42; }
+  .members__note { font-size: 0.94rem; line-height: 1.65; }
+
+  .corevals__ico .ico { width: 2.2em; height: 2.2em; }
+  .corevals__grid strong { font-size: 0.85rem; letter-spacing: 0.08em; }
+  .corevals__grid p { font-size: 0.84rem; line-height: 1.55; }
+
+  /* The closing line is set in caps; at phone width it needs the extra leading
+     or it reads as a block. */
+  .arearow__quote {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    letter-spacing: 0.04em;
+    padding: 16px 16px;
+  }
+}
+
+
+/* --- recognition band on the About page ---------------------------------- */
+/* The convention photograph is a cut-out, so it stands on the band rather than
+   filling a box: same treatment as the home page hero. */
+.recog {
+  background: var(--mock-band);
+  position: relative;
+  overflow: hidden;
+}
+.recog::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 52%;
+  /* The wash has to reach the band's own colour at the right-hand edge, and the
+     darkening has to live in the gradient rather than in a filter: a filter also
+     dims the wash, so the edge came out darker than the band and left a seam. */
+  background-image:
+    linear-gradient(270deg,
+      var(--mock-band) 0%,
+      rgba(12,19,38,0.97) 12%,
+      rgba(12,19,38,0.82) 40%,
+      rgba(12,19,38,0.7) 72%,
+      rgba(12,19,38,0.86) 100%),
+    url("/img/colonnade.webp");
+  background-size: cover, cover;
+  background-position: center, 40% 40%;
+  pointer-events: none;
+}
+.recog__grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(24px, 4vw, 56px);
+  align-items: end;
+}
+.recog__media { align-self: end; }
+.recog__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 400px;
+  object-fit: contain;
+  object-position: bottom center;
+}
+.recog__copy { padding-block: clamp(40px, 5vw, 68px); }
+.recog__copy h2 {
+  color: var(--mock-white);
+  font-size: clamp(1.4rem, 1.15rem + 1.2vw, 1.95rem);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.recog__rule {
+  display: block; width: 58px; height: 2px;
+  background: var(--mock-gold);
+  margin: 0.9rem 0 1.5rem;
+}
+.recog__copy ul { list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(16px, 2vw, 22px); }
+.recog__copy li { display: flex; gap: 15px; align-items: flex-start; }
+.recog__ico {
+  flex: none;
+  width: 46px; height: 46px;
+  display: grid; place-items: center;
+  border: 1px solid rgba(220,169,85,0.5);
+  border-radius: 50%;
+  color: var(--mock-gold);
+}
+.recog__ico .ico { width: 1.6em; height: 1.6em; }
+.recog__copy li strong {
+  display: block;
+  color: var(--mock-white);
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+}
+.recog__copy li span span { color: #A9B8C9; font-size: 0.9rem; line-height: 1.6; }
+.recog__note {
+  margin-top: clamp(18px, 2.4vw, 26px);
+  color: #8FA0B3;
+  font-size: 0.84rem;
+  font-style: italic;
+}
+
+@media (max-width: 900px) {
+  .recog__grid { grid-template-columns: 1fr; gap: 0; }
+  /* Stacked on a phone the photograph comes first, so the colonnade belongs
+     behind it. Left at the bottom it ran under the copy and the columns cut
+     through the text. */
+  .recog::before {
+    width: 100%; height: 46%; inset: 0 0 auto 0;
+    background-image:
+      linear-gradient(180deg,
+        rgba(12,19,38,0.5) 0%,
+        rgba(12,19,38,0.72) 55%,
+        var(--mock-band) 100%),
+      url("/img/colonnade.webp");
+  }
+  .recog__copy { padding-block: clamp(34px, 7vw, 48px) clamp(20px, 4vw, 30px); }
+  .recog__media { padding-bottom: 0; }
+  .recog__media img { max-height: 330px; }
+}
+@media (max-width: 760px) {
+  .recog__copy h2 { font-size: clamp(1.35rem, 1.1rem + 2vw, 1.7rem); }
+  .recog__copy li span span { font-size: 0.92rem; }
+  .recog__ico { width: 42px; height: 42px; }
+}
+
+
+/* ==========================================================================
+   Home page: the sections that were not part of the client's mock-up
+   Approach, figures, testimonials, the call band, Insights and the enquiry form
+   came from the original warm-paper design, so after the dark hero the page
+   turned white halfway down. They are brought onto the dark palette here,
+   scoped to .page-home so the inner pages that share these classes are
+   untouched.
+   ========================================================================== */
+
+.page-home .section { background: var(--mock-ink); color: #C3CFDC; }
+.page-home .section--sunk { background: var(--mock-band); }
+.page-home .section--surface { background: var(--mock-ink); }
+
+.page-home .section h2,
+.page-home .section h3 { color: var(--mock-white); }
+.page-home .section .eyebrow { color: var(--mock-gold); }
+.page-home .section .eyebrow::after { background: rgba(255, 255, 255, 0.16); }
+.page-home .section .ruled::after { background: var(--mock-gold); }
+.page-home .section p { color: #B8C6D6; }
+.page-home .section a:not(.btn) { color: var(--mock-gold); }
+.page-home .section a:not(.btn):hover { color: #fff; }
+
+/* Cards, tiles and quotes on the dark ground. */
+.page-home .card,
+.page-home .tile,
+.page-home .tcar__item {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(220, 169, 85, 0.22);
+}
+/* The light design tints a card warm-beige on hover. On the dark ground that
+   turns the card into a pale block with white text on it - unreadable. */
+.page-home a.card:hover,
+.page-home a.card:focus-visible {
+  background: rgba(220, 169, 85, 0.1);
+  border-color: rgba(220, 169, 85, 0.5);
+}
+.page-home .card:hover { border-color: rgba(220, 169, 85, 0.5); }
+.page-home .card h3,
+.page-home .tile h3 { color: var(--mock-white); }
+.page-home .card__more { color: var(--mock-gold); }
+.page-home .quote { color: #C9D4E1; }
+.page-home .quote__mark { color: var(--mock-gold); }
+.page-home .tag,
+.page-home .article-meta { color: #9FAFC0; }
+.page-home .notice {
+  background: rgba(220, 169, 85, 0.07);
+  border-color: rgba(220, 169, 85, 0.3);
+  color: #C9D4E1;
+}
+.page-home .detail-list .row { border-color: rgba(255, 255, 255, 0.12); }
+.page-home .detail-list dt { color: var(--mock-gold); }
+.page-home .detail-list dd { color: #C9D4E1; }
+
+/* The figures band keeps its photograph but sits on the same ink. */
+.page-home .stats { background: var(--mock-ink); }
+.page-home .stat__value { color: var(--mock-gold); }
+.page-home .stat__label { color: #A9B8C9; }
+.page-home .callband { background: var(--mock-band); border-block: 1px solid rgba(220,169,85,0.22); }
+
+/* The enquiry form: fields have to be legible on ink, and the focus ring has to
+   stay visible - it is the only cue a keyboard user gets. */
+.page-home .form {
+  background: rgba(255, 255, 255, 0.035);
+  border-color: rgba(220, 169, 85, 0.22);
+}
+.page-home .field label,
+.page-home .checkbox { color: #D7E0EA; }
+.page-home .hint { color: #8FA0B3; }
+.page-home .field input,
+.page-home .field select,
+.page-home .field textarea {
+  background: rgba(1, 11, 20, 0.6);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #EEF3F8;
+}
+.page-home .field input::placeholder,
+.page-home .field textarea::placeholder { color: #7E8C9E; }
+.page-home .field input:focus,
+.page-home .field select:focus,
+.page-home .field textarea:focus {
+  border-color: var(--mock-gold);
+  outline-color: var(--mock-gold);
+}
+.page-home .field select option { color: #16202E; }
+.page-home .btn--primary {
+  background: var(--mock-gold);
+  border-color: var(--mock-gold);
+  color: var(--mock-ink);
+}
+.page-home .btn--primary:hover { background: #fff; border-color: #fff; }
+.page-home .checkbox a { color: var(--mock-gold); }
+
+/* --- and on a phone ------------------------------------------------------- */
+@media (max-width: 760px) {
+  /* These sections were built with desktop rhythm. On a phone the page runs to
+     nearly ten thousand pixels, so the vertical padding comes in. */
+  .page-home .section { padding-block: clamp(38px, 9vw, 56px); }
+  .page-home .grid { gap: 12px; }
+  .page-home .card,
+  .page-home .tile { padding: 18px 16px; }
+  .page-home .stats { padding-block: clamp(30px, 7vw, 44px); }
+  .page-home .callband { padding-block: clamp(26px, 6vw, 38px); }
+  .page-home .form { padding: 18px 15px; }
+  .page-home .btn--primary { width: 100%; text-align: center; }
+}
+
+
+/* ==========================================================================
+   Home hero on a phone: text, call to action, photograph
+   The three things the client asked to see improved. Desktop is untouched.
+   ========================================================================== */
+
+@media (max-width: 760px) {
+  /* --- text ------------------------------------------------------------- */
+  .mhero__eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    margin-bottom: 1.15rem;
+    /* A short gold rule before the label, as the section eyebrows have. */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mhero__eyebrow::before {
+    content: "";
+    width: 26px; height: 2px;
+    background: var(--mock-gold);
+    flex: none;
+  }
+
+  .mhero__name {
+    font-size: clamp(2.3rem, 1.1rem + 7vw, 3.1rem);
+    line-height: 0.98;
+    letter-spacing: -0.005em;
+  }
+  /* The gold half of the name carries the weight, so it gets the tighter track
+     and a hair more size than the white line above it. */
+  .mhero__name--gold { letter-spacing: -0.01em; }
+
+  .mhero__strap {
+    color: #fff;
+    font-size: clamp(1.18rem, 1rem + 2vw, 1.5rem);
+    line-height: 1.25;
+    margin-top: 1rem;
+  }
+  .mhero__rule { width: 68px; height: 2px; margin: 1.1rem 0 1.2rem; }
+  .mhero__lede {
+    color: #C6D2DE;
+    font-size: 1.02rem;
+    line-height: 1.7;
+    /* A character count was right when the lede had the full width to itself.
+       It now shares the line with the cut-out, so the cap has to be the same
+       fraction the rest of the column uses, or the last words cross the face. */
+    max-width: 52%;
+    margin-bottom: 1.7rem;
+  }
+
+  /* --- call to action --------------------------------------------------- */
+  /* Outlined is right on a wide dark hero; on a phone it is the only action on
+     the first screen, so it becomes the solid, unmissable one. The arrow sits
+     hard right so the button reads as a step forward rather than a label. */
+  .mhero .btn--ghostgold {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    min-height: 56px;
+    padding: 16px 20px;
+    background: var(--mock-gold);
+    border-color: var(--mock-gold);
+    color: var(--mock-ink);
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+  }
+  .mhero .btn--ghostgold span { font-size: 1.15rem; line-height: 1; }
+  .mhero .btn--ghostgold:active { background: var(--mock-gold-deep); border-color: var(--mock-gold-deep); }
+
+  /* --- photograph ------------------------------------------------------- */
+  /* The hairline and vignette here belonged to the full-width photograph band
+     that used to sit under the copy. The cut-out now stands beside the copy, so
+     the frame furniture goes. How the figure is fitted is settled once, in the
+     860px block - nothing here may touch object-fit or object-position, or it
+     silently overrides it. */
+  .mhero__media {
+    border-top: 0;
+    margin-top: 0;
+  }
+
+  /* --- stats ------------------------------------------------------------ */
+  /* Hairline dividers between the pairs, so the block reads as one unit rather
+     than three stray lines of text. */
+  .mstats {
+    gap: 0;
+    margin-top: 4px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .mstats li {
+    flex: 1 1 calc(50% - 0.5px);
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .mstats li:nth-child(odd) { border-right: 1px solid rgba(255, 255, 255, 0.12); padding-right: 14px; }
+  .mstats li:nth-child(even) { padding-left: 14px; }
+  .mstats li:last-child { flex-basis: 100%; border-right: 0; padding-left: 0; }
+}
+
+
+/* --- home page: three things the dark treatment missed -------------------- */
+/* Found by reading computed styles rather than by eye: the testimonial card, the
+   call band button and the notice heading were all still painted for the light
+   design. */
+
+/* The carousel item is a wrapper; the white sheet is the quote inside it. */
+.page-home .tcar__item > .quote,
+.page-home .quote {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(220, 169, 85, 0.22);
+  color: #D5DFEA;
+}
+.page-home .quote cite,
+.page-home .quote footer,
+.page-home .quote__attrib { color: #8FA0B3; }
+
+/* Carousel controls were white squares on a dark band. */
+.page-home .tcar__controls button {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(220, 169, 85, 0.35);
+  color: var(--mock-gold);
+}
+.page-home .tcar__controls button:hover:not(:disabled) {
+  background: var(--mock-gold);
+  border-color: var(--mock-gold);
+  color: var(--mock-ink);
+}
+.page-home .tcar__controls button:disabled { opacity: 0.35; }
+
+/* The call band button was still the old olive gold, next to a hero button in
+   the new warmer one. */
+.page-home .callband .btn--gold,
+.page-home .btn--gold {
+  background: var(--mock-gold);
+  border-color: var(--mock-gold);
+  color: var(--mock-ink);
+}
+.page-home .btn--gold:hover { background: #fff; border-color: #fff; }
+
+/* "Please note." was ink-dark inside a dark notice, so it read as a gap in the
+   sentence. */
+.page-home .notice strong { color: var(--mock-gold); }
+
+
+/* ==========================================================================
+   Home hero and type scale on a phone - corrected against measured values
+   Measured at 390px before this block: the name rendered at 45px, the band and
+   About headings at 30px while the headings below them were 26px, the figures at
+   34px, and the hero photograph painted only 288px wide inside a 390px box, so
+   it floated with empty space either side.
+   ========================================================================== */
+
+@media (max-width: 760px) {
+  /* --- type scale ------------------------------------------------------- */
+  /* 45px was wider than the screen could carry; this lands near 36px at 390px,
+     which fills the measure without shouting. */
+  .mhero__name {
+    font-size: clamp(1.9rem, 1.05rem + 5vw, 2.35rem);
+    line-height: 1.02;
+  }
+  .mhero__strap { font-size: clamp(1.12rem, 1rem + 1.2vw, 1.3rem); }
+  .mhero__lede { font-size: 0.98rem; line-height: 1.68; }
+
+  /* One heading size for the whole page. The band and About band were a third
+     larger than the sections under them, which read as an accident. */
+  .areaband__head,
+  .aboutband__copy h2,
+  .page-home .section h2 {
+    font-size: clamp(1.42rem, 1.15rem + 1.5vw, 1.65rem);
+    line-height: 1.2;
+  }
+  /* The figures were larger than any heading on the page. */
+  .page-home .stat__value { font-size: 1.7rem; }
+  /* Card headings were 18px in one section and 20px in another. */
+  .page-home .card h3,
+  .page-home .tile h3 { font-size: 1.06rem; line-height: 1.3; }
+
+  /* --- the photograph --------------------------------------------------- */
+  /* The cut-out sits beside the copy (see the 860px block), not in a full-width
+     band beneath it, so the treatment that band needed is gone: no colonnade
+     backdrop and no gold hairlines. Sizing and focal point are settled in the
+     860px block - do not set object-fit or object-position here, or it overrides
+     that block without saying so. */
+  .mhero__media {
+    margin-top: 0;
+    border: 0;
+    background-image: none;
+  }
+}
+
+
+/* --- navigation: the selected item, in gold ------------------------------- */
+/* The active item's text was already gold, but its underline was still the old
+   olive accent, so the two never matched. Tapping gave no feedback either. */
+.masthead--dark .nav a[aria-current="page"] {
+  color: var(--mock-gold);
+  border-bottom-color: var(--mock-gold);
+}
+.masthead--dark .nav a:hover,
+.masthead--dark .nav a:focus-visible,
+.masthead--dark .nav a:active { color: var(--mock-gold); }
+.masthead--dark .nav a:hover { border-bottom-color: rgba(220, 169, 85, 0.45); }
+
+/* The CTA rests outlined, so "current" reads as the filled colour instead. */
+.masthead--dark .nav__cta[aria-current="page"] {
+  background: var(--mock-gold);
+  color: var(--mock-ink) !important;
+  border-color: var(--mock-gold);
+}
+
+@media (max-width: 1200px) {
+  /* In the drop-down panel there is no underline to colour, so the selected item
+     gets a gold bar down its left edge as well as gold text - visible at a
+     glance while scanning a stacked list. */
+  .masthead--dark .nav a[aria-current="page"] {
+    color: var(--mock-gold);
+    border-left: 3px solid var(--mock-gold);
+    padding-left: 12px;
+    background: rgba(220, 169, 85, 0.07);
+  }
+  /* Immediate feedback on tap, since there is no hover on a touch screen. */
+  .masthead--dark .nav a:active {
+    color: var(--mock-gold);
+    background: rgba(220, 169, 85, 0.12);
+  }
+  .masthead--dark .nav__cta[aria-current="page"] {
+    border-left: 0;
+    padding-left: 16px;
+  }
+}
+
+
+/* --- recognition band, framed-photograph variant -------------------------- */
+/* On the home page the band carries the chamber portrait rather than the cut-out,
+   so the photograph is a framed rectangle and the colonnade behind it comes off. */
+.recog--full::before { width: 100%; }
+.recog--full .recog__grid { grid-template-columns: 1fr; }
+.recog--full .recog__copy { max-width: var(--measure); margin-inline: auto; text-align: left; }
+
+.recog--framed::before { display: none; }
+.recog--framed .recog__grid { align-items: center; }
+.recog--framed .recog__media { align-self: center; padding-block: clamp(30px, 4vw, 48px); }
+.recog--framed .recog__media img {
+  max-height: 360px;
+  height: 100%;
+  object-fit: cover;
+  object-position: 46% 20%;
+  border: 1px solid rgba(220, 169, 85, 0.3);
+}
+@media (max-width: 900px) {
+  .recog--framed .recog__media { padding-block: clamp(24px, 6vw, 36px) 0; }
+  .recog--framed .recog__media img { max-height: 300px; }
+}
+
+
+/* --- the menu button ------------------------------------------------------ */
+/* Was a plain bordered word. Now gold-edged with three bars that fold into a
+   cross when the panel opens, so its state is readable at a glance, and sized
+   past the 44px a finger needs. */
+.masthead--dark .nav-toggle {
+  display: none;
+  align-items: center;
+  gap: 9px;
+  min-height: 46px;
+  padding: 10px 14px;
+  border: 1px solid rgba(220, 169, 85, 0.55);
+  border-radius: 2px;
+  background: rgba(220, 169, 85, 0.06);
+  color: var(--mock-gold);
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+.masthead--dark .nav-toggle:hover,
+.masthead--dark .nav-toggle:active,
+.masthead--dark .nav-toggle[aria-expanded="true"] {
+  background: var(--mock-gold);
+  border-color: var(--mock-gold);
+  color: var(--mock-ink);
+}
+
+.nav-toggle__label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Three bars: the element itself is the middle one, the outer two are its
+   pseudo-elements, so the whole thing animates as one piece. */
+.nav-toggle__bars {
+  position: relative;
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: currentColor;
+  transition: background-color 0.18s ease, transform 0.22s ease;
+}
+.nav-toggle__bars::before,
+.nav-toggle__bars::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 20px;
+  height: 2px;
+  background: currentColor;
+  transition: transform 0.22s ease, top 0.18s ease, bottom 0.18s ease;
+}
+.nav-toggle__bars::before { top: -6px; }
+.nav-toggle__bars::after { bottom: -6px; }
+
+/* Open: the middle bar disappears and the outer two cross. */
+.nav-toggle.is-open .nav-toggle__bars { background: transparent; }
+.nav-toggle.is-open .nav-toggle__bars::before { top: 0; transform: rotate(45deg); }
+.nav-toggle.is-open .nav-toggle__bars::after { bottom: 0; transform: rotate(-45deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-toggle__bars,
+  .nav-toggle__bars::before,
+  .nav-toggle__bars::after { transition: none; }
+}
+
+@media (max-width: 1200px) {
+  .masthead--dark .nav-toggle { display: flex; }
+}
+
+
+/* ==========================================================================
+   Home page: the light-panel bugs
+   Root cause of the "faded" sections: the dark treatment gave cards a
+   TRANSLUCENT background. Several of the original components sit on light
+   containers - .grid paints itself --rule and shows a 1px hairline through the
+   gaps, .form and .quote are white sheets - so that light ground read straight
+   through the cards, and white text landed on a pale grey panel. Sampling the
+   rendered pixels showed #E0DDD6 behind the Insights text.
+
+   Every panel below is therefore OPAQUE.
+   ========================================================================== */
+
+/* The original grid separates cards with a 1px gap over a coloured background.
+   The phone layout widens that gap to 12px, which turns the same trick into
+   thick grey bars, so on this page the container goes transparent and each card
+   carries its own hairline instead. */
+.page-home .grid {
+  background: transparent;
+  border: 0;
+  overflow: visible;
+}
+.page-home .grid > .card { border: 1px solid rgba(220, 169, 85, 0.22); }
+
+.page-home .card,
+.page-home .tile,
+.page-home .tcar__item > .quote,
+.page-home .quote,
+.page-home .form {
+  background: #0C1626;
+}
+.page-home a.card:hover,
+.page-home a.card:focus-visible { background: #142338; }
+
+.page-home .notice {
+  background: #131B2D;
+  border-color: rgba(220, 169, 85, 0.35);
+}
+
+/* The validation summary was warm-tinted for the light design; on ink it needs
+   its own dark red so an error still reads as an error. */
+.page-home .alert {
+  background: #2A1512;
+  border-color: rgba(214, 106, 92, 0.55);
+  color: #F3D9D4;
+}
+.page-home .alert strong { color: #FFB3A7; }
+.page-home .alert a { color: #FFC9BE; }
+
+/* Fields opaque too, for the same reason. */
+.page-home .field input,
+.page-home .field select,
+.page-home .field textarea {
+  background: #060F1C;
+}
+.page-home .field input[aria-invalid="true"],
+.page-home .field select[aria-invalid="true"],
+.page-home .field textarea[aria-invalid="true"] {
+  background: #24110F;
+  border-color: rgba(214, 106, 92, 0.7);
+}
+
+/* --- the menu button, smaller ---------------------------------------------- */
+/* It was a bordered box with an icon AND the word MENU, which came out far too
+   heavy for a phone header. Icon only now, at 44px square - the size a finger
+   needs and no larger. The label stays in the DOM for screen readers. */
+.masthead--dark .nav-toggle {
+  width: 44px;
+  height: 44px;
+  min-height: 0;
+  padding: 0;
+  justify-content: center;
+  gap: 0;
+}
+.nav-toggle__label {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.nav-toggle__bars { width: 18px; }
+.nav-toggle__bars::before,
+.nav-toggle__bars::after { width: 18px; }
+
+
+/* --- home page: the testimonial card -------------------------------------- */
+/* The quotation itself is a <blockquote> with its own ink colour, so it kept the
+   light design's near-black text on the dark card and read as a smudge. */
+.page-home .quote blockquote { color: #D5DFEA; }
+.page-home .quote figcaption { color: #8FA0B3; }
+/* The slide is just a wrapper; the card inside carries the panel. */
+.page-home .tcar__item { background: transparent; border: 0; }
+
+
+/* ==========================================================================
+   Home hero on a phone, to the client's mockup (19 Aug 2026)
+
+   This block is deliberately LAST in the file. The mobile hero was reworked
+   several times and there are four earlier phone blocks above that set the same
+   properties; rather than thread edits through all of them, the mockup is
+   settled here, once, where it wins. If you change the phone hero, change it
+   here.
+
+   What the mockup asks for, and what the earlier blocks got wrong:
+     - "ADV. JAVED" on one line, "PASHU" and "SAYYED" under it. The type was
+       sized for the full column width, so it broke after "ADV.".
+     - the strap on one line, and no gold dash before the eyebrow.
+     - an OUTLINED call to action, not the solid gold one a phone block had
+       switched it to.
+     - the stats as three centred columns, gold icon above the words. They were
+       laid out as icon-beside-text, left aligned.
+     - the photograph filling the right-hand side from the headline down to the
+       stats rule.
+   ========================================================================== */
+@media (max-width: 860px) {
+  .mhero__inner { padding-block: clamp(24px, 6.5vw, 36px) 0; }
+  .mhero__copy { max-width: none; }
+
+  /* The eyebrow clears the photograph, so it keeps nearly the full width and
+     stays on one line. Everything below it shares the line with the figure and
+     is capped to the left-hand column. */
+  .mhero__eyebrow { max-width: 74%; font-size: 0.6rem; letter-spacing: 0.16em; margin-bottom: 0.85rem; }
+  .mhero__eyebrow::before { display: none; }
+
+  /* 52%, against the photograph's 48%: because the figure is cropped to fill its
+     column, its left-hand edge is opaque lectern rather than clear margin, so
+     anything wider than this runs underneath it. */
+  .mhero__name,
+  .mhero__strap,
+  .mhero__lede { max-width: 52%; }
+
+  /* Sized so "ADV. JAVED" holds one line, and the strap holds one line, all the
+     way down to a 360px phone.
+
+     The steep vw term with a px subtracted is not decoration: these two lines have
+     to fit a column that is itself a percentage of the viewport minus the fixed
+     30px gutters, so the space available grows faster than the viewport does. A
+     plain `rem + vw` ramp overshot at the narrow end and broke "ADV. JAVED" after
+     the full stop. */
+  .mhero__name { font-size: clamp(1.35rem, calc(7.6vw - 3px), 2rem); line-height: 1.07; }
+  .mhero__strap { font-size: clamp(0.78rem, calc(3.9vw - 1.5px), 1rem); line-height: 1.32; margin-top: 0.75rem; }
+  .mhero__rule { width: 52px; height: 2px; margin: 0.95rem 0 1.05rem; }
+  .mhero__lede { font-size: clamp(0.8rem, 0.67rem + 0.85vw, 0.94rem); line-height: 1.62; margin-bottom: 1.4rem; }
+
+  /* Outlined, as in the mockup: dark ground, gold hairline, white lettering. */
+  .mhero .btn--ghostgold {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    width: auto;
+    max-width: 52%;
+    min-height: 0;
+    padding: 13px 15px;
+    background: transparent;
+    border: 1px solid rgba(220, 169, 85, 0.75);
+    color: #fff;
+    font-size: 0.66rem;
+    letter-spacing: 0.1em;
+  }
+  .mhero .btn--ghostgold span { font-size: 0.95rem; }
+  .mhero .btn--ghostgold:active { background: rgba(220, 169, 85, 0.14); }
+
+  /* The figure sits top-right, beside the headline. Anchored top AND bottom
+     (rather than a fixed aspect-ratio) so the box's height always matches the
+     section's own - it can never run past the section's bottom edge and lose
+     its lower portion to .mhero's overflow:hidden. */
+  .mhero__media {
+    inset: clamp(48px, 13.5vw, 68px) 0 0 auto;
+    width: 48%;
+    height: auto;
+    max-width: none;
+    margin: 0;
+    border: 0;
+    background-image: none;
+  }
+  .mhero__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+  /* Nothing is cropped now, so there is no hard vertical cut to dissolve and the
+     wash would only dim the lectern. */
+  .mhero__media::after { display: none; }
+
+  /* Three centred columns under a hairline, icon above the words. */
+  .mstats {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 0;
+    margin-top: clamp(20px, 5vw, 30px);
+    padding: clamp(16px, 4vw, 22px) 0 clamp(18px, 4.5vw, 26px);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .mstats li {
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 7px;
+    padding: 0 5px;
+    border-right: 1px solid rgba(255, 255, 255, 0.12);
+  }
+  .mstats li:last-child { border-right: 0; padding-right: 5px; }
+  .mstats__ico .ico { width: 1.65em; height: 1.65em; }
+  .mstats strong,
+  .mstats__label { font-size: 0.88rem; line-height: 1.25; }
+  .mstats__sub { font-size: 0.74rem; line-height: 1.3; }
+}
+
+
+/* --- home hero on a phone: the figure gets its own full-width row ---------- */
+/* Beside the copy the figure is held to 48% of the viewport, which on a phone is
+   under 190px - the whole point of this photograph, the lectern and its "HIGH
+   COURT OF BOMBAY" lettering, is unreadable at that size, and the dark panel to
+   its right and below sits empty. Below 620px it is taken out of the corner and
+   given the full column instead, the same way the About hero stacks. It follows
+   the copy in the DOM, so it lands at the foot of the hero.
+
+   Must come after the 860px block above: it re-declares position and inset. */
+@media (max-width: 620px) {
+  .mhero {
+    display: flex;
+    flex-direction: column;
+  }
+  .mhero__inner { order: 1; }
+  .mhero__media {
+    order: 2;
+    position: relative;
+    inset: auto;
+    width: 100%;
+    /* The photograph's own ratio, so `cover` has nothing to crop here either. */
+    aspect-ratio: 1.2343;
+    margin-top: clamp(14px, 4vw, 22px);
+  }
+  .mhero__media img {
+    object-fit: cover;
+    object-position: center;
+  }
+
+  /* The copy no longer shares its line with anything, so the caps that kept it
+     clear of the figure would now just waste the right-hand half of the screen. */
+  .mhero__eyebrow,
+  .mhero__name,
+  .mhero__strap,
+  .mhero__lede { max-width: none; }
+  .mhero .btn--ghostgold { max-width: none; }
+
+
+  /* --- about band on a phone (client design, 29 Aug 2026) ----------------- */
+  /* The portrait carries more of the band and the colonnade behind it is left
+     brighter, so it reads as the courthouse it is rather than as a grey wash. */
+  /* The colonnade stands behind the photograph, and the design closes it off at
+     the gold rule under the lectern. Its height here is a percentage of a band
+     whose own height depends on how the copy wraps, so it cannot land on that
+     rule at every width. A vertical fade to the band's colour means it does not
+     have to: wherever it ends it dissolves, instead of drawing the hard line
+     across the credential cards that a flat wash cut to 52% was leaving. */
+  .aboutband::before {
+    height: 46%;
+    background-image:
+      linear-gradient(180deg,
+        rgba(12, 19, 38, 0.45) 0%,
+        rgba(12, 19, 38, 0.55) 55%,
+        rgba(12, 19, 38, 0.90) 85%,
+        var(--mock-band) 100%),
+      url("/img/colonnade.webp");
+    background-size: cover, cover;
+    background-position: center, 60% 35%;
+    filter: saturate(0.4) brightness(0.72);
+  }
+  /* The cut-out is right-aligned inside its own canvas: 15.6% of the frame is
+     empty on the left against 1.0% on the right, which is what seats the figure
+     in the corner of the desktop hero. That puts his centre at 57.3% of the
+     asset. Here the photograph runs the width of the screen, so the same padding
+     pushed him visibly right of the panel's axis. Shifting by the difference
+     (57.3 - 50) centres him, and nothing is clipped - what leaves the right edge
+     is transparent. Recompute both numbers if the cut-out is replaced. */
+  .aboutband__portrait img {
+    max-height: none;
+    transform: translateX(-7.3%);
+  }
+  /* The lectern base was finishing within a few pixels of the gold rule that
+     closes the photograph off from the name. */
+  .aboutband__portrait { padding-bottom: clamp(10px, 3vw, 18px); }
+
+  /* The label heads the whole band, above the photograph, and the eyebrow that
+     sits inside the copy on desktop stands down so it is not said twice. */
+  .aboutband__grid .aboutband__label {
+    display: block;
+    /* max-content so the gold underline stops with the words rather than
+       running the width of the band. */
+    width: max-content;
+    max-width: 100%;
+    margin: 0;
+    padding: clamp(22px, 6vw, 30px) 0 8px;
+    border-bottom: 1px solid var(--mock-gold);
+    color: var(--mock-gold);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+  }
+  /* The base eyebrow draws its own leading rule, which would collide with the
+     underline above. */
+  .aboutband__grid .aboutband__label::before,
+  .aboutband__grid .aboutband__label::after { display: none; }
+  .aboutband__copy > .eyebrow { display: none; }
+
+  /* Centred masthead: name, ornament, roles - then the two columns. A gold
+     hairline closes the photograph off from the copy, as in the design. */
+  .aboutband__copy {
+    text-align: center;
+    border-top: 1px solid rgba(220, 169, 85, 0.45);
+  }
+  .aboutband__copy h2 { margin-bottom: 0.75rem; }
+  .aboutband__namepre { color: var(--mock-gold); }
+
+  /* Qualified to match the base rule that hides these above this breakpoint. */
+  .aboutband__copy .aboutband__orn {
+    display: block;
+    width: 132px;
+    margin: 0 auto 0.75rem;
+  }
+  /* Qualified with .aboutband__copy on purpose: the band's own `.aboutband__copy
+     p` rule sets a colour and size, and a lone .aboutband__roles class loses to
+     it on specificity - the line came out body-blue at body size. */
+  .aboutband__copy .aboutband__roles {
+    display: block;
+    max-width: none;
+    margin-bottom: clamp(18px, 5vw, 26px);
+    color: var(--mock-gold);
+    /* Sized to hold one line down to a 360px phone; it reads as a broken
+       heading the moment "LEGAL ADVISOR" wraps on its own. */
+    font-size: 0.64rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* Credentials beside the copy, as in the design. The columns are held apart by
+     a hairline rather than by whitespace alone - at this width there is not
+     enough gutter for the split to read on its own. */
+  .aboutband__body {
+    display: grid;
+    grid-template-columns: minmax(0, 0.82fr) minmax(0, 1fr);
+    gap: clamp(14px, 4vw, 22px);
+    text-align: left;
+  }
+  /* Outlined cards, as in the design - not a plain list. */
+  .aboutband__copy .aboutband__creds {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  /* Roomier than the first pass at this design: at 9px/10px the cards sat as a
+     tight stack of boxes and the two-line labels had no air around them. */
+  .aboutband__creds li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border: 1px solid rgba(220, 169, 85, 0.3);
+    background: rgba(255, 255, 255, 0.02);
+    color: #C9D4E0;
+    font-size: 0.7rem;
+    line-height: 1.32;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .aboutband__credico {
+    flex: none;
+    color: var(--mock-gold);
+  }
+  .aboutband__credico .ico { width: 1.65em; height: 1.65em; }
+
+  /* A short gold rule opens each paragraph after the first, the way the design
+     separates them. */
+  .aboutband__text p {
+    font-size: 0.82rem;
+    line-height: 1.62;
+    margin-bottom: 0.9rem;
+  }
+  .aboutband__text p + p {
+    padding-top: 0.85rem;
+    position: relative;
+  }
+  .aboutband__text p + p::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 34px;
+    height: 1px;
+    background: var(--mock-gold);
+    opacity: 0.75;
+  }
+  .aboutband__text p:last-child { margin-bottom: 0; }
+
+  .aboutband__copy .btn { margin-top: clamp(20px, 5vw, 28px); }
+
+  /* Circled scales between two fading rules - the design's closing device. */
+  .aboutband__copy .aboutband__seal {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: clamp(22px, 6vw, 30px);
+    color: var(--mock-gold);
+  }
+  .aboutband__seal::before,
+  .aboutband__seal::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, currentColor 45%, currentColor 55%, transparent);
+  }
+  .aboutband__seal .ico {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    padding: 8px;
+    border: 1px solid rgba(220, 169, 85, 0.55);
+    border-radius: 50%;
+    box-sizing: content-box;
+  }
+
+  /* The strip under this band lists these same four courts. Saying it twice on
+     one phone screen reads as a mistake, so the strip stands down here. */
+  .courtstrip { display: none; }
+}
+
+
+/* ==========================================================================
+   Mobile menu panel (19 Aug 2026)
+
+   Last in the file for the same reason the hero block above is: the nav is set
+   in the base stylesheet and again in a 1040px block, and the panel has to win
+   over both.
+
+   What was wrong: the panel was an absolutely positioned drop-down as tall as
+   its own contents, so it stopped part-way down the screen and the page behind
+   it - the hero's stats row, then the pale Practice Areas band - showed beneath
+   it as if the menu had been cut off. The page behind also stayed scrollable,
+   and the current item was drawn as a heavy filled block that matched nothing
+   else in the design.
+   ========================================================================== */
+@media (max-width: 1200px) {
+  /* Fixed and taken to the foot of the screen, so the panel is the whole view
+     below the header and nothing shows underneath it. Its own scroll means a
+     longer menu, or a short landscape window, still reaches every item. */
+  .masthead--dark .nav {
+    position: fixed;
+    top: var(--masthead-h, 74px);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 60;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    padding: clamp(8px, 2.5vw, 14px) var(--gutter) calc(env(safe-area-inset-bottom, 0px) + 24px);
+    background: var(--mock-ink);
+    border-bottom: 0;
+    box-shadow: none;
+  }
+
+  /* The bar has to sit above the panel, or the panel covers the close button. */
+  .masthead--dark { position: relative; z-index: 70; }
+
+  .masthead--dark .nav a {
+    display: flex;
+    align-items: center;
+    padding: 15px 2px;
+    font-size: 1.02rem;
+    color: #E6ECF3;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .masthead--dark .nav a:last-of-type { border-bottom: 0; }
+
+  /* The current item: gold lettering behind a gold bar down its left edge, and
+     nothing else. A block above already draws that bar, so this only has to keep
+     the bottom hairline neutral - it was being tinted gold as well, which closed
+     the item into a box and made it read as a button rather than a location. */
+  .masthead--dark .nav a[aria-current="page"] {
+    color: var(--mock-gold);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  .masthead--dark .nav a:active { color: var(--mock-gold); }
+
+  /* The caret belongs to the desktop drop-down. */
+  .masthead--dark .nav__caret { display: none; }
+
+  .masthead--dark .nav__cta {
+    justify-content: center;
+    margin-top: 20px;
+    padding: 15px 16px !important;
+    border-bottom: 0 !important;
+    border-radius: 2px;
+    background: var(--mock-gold);
+    color: var(--mock-ink) !important;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+  }
+  .masthead--dark .nav__cta::before { display: none; }
+}
+
+/* The page behind the open panel must not scroll: on a phone the panel is the
+   whole view, and a page moving underneath it is disorienting. */
+body.nav-open { overflow: hidden; }
+
+
+/* ==========================================================================
+   The menu button (19 Aug 2026)
+
+   Three problems with it. Opening the menu filled the button solid gold, which
+   made the close control the loudest thing on the screen and put it in direct
+   competition with the gold "Consult Now" button in the panel underneath - two
+   gold blocks, and the wrong one drew the eye. The icon was 18px inside a 44px
+   target, so it read as thin and slightly lost. And there was no keyboard focus
+   ring at all, on the one control that opens the navigation.
+   ========================================================================== */
+@media (max-width: 1200px) {
+  .masthead--dark .nav-toggle {
+    border-radius: 3px;
+    border-color: rgba(220, 169, 85, 0.5);
+    background: rgba(220, 169, 85, 0.08);
+    color: var(--mock-gold);
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+  }
+
+  /* Open, hovered and pressed are now degrees of the same idea - a deeper gold
+     tint behind a full-strength hairline - rather than a jump to a solid fill.
+     The icon stays gold throughout, so it never has to switch to dark ink. */
+  .masthead--dark .nav-toggle:hover,
+  .masthead--dark .nav-toggle[aria-expanded="true"] {
+    background: rgba(220, 169, 85, 0.16);
+    border-color: var(--mock-gold);
+    color: var(--mock-gold);
+  }
+  .masthead--dark .nav-toggle:active {
+    background: rgba(220, 169, 85, 0.26);
+    border-color: var(--mock-gold);
+    color: var(--mock-gold);
+  }
+
+  /* The button is the only way into the navigation on a phone, so it needs a
+     focus ring you can actually see. Offset so it reads outside the hairline. */
+  .masthead--dark .nav-toggle:focus-visible {
+    outline: 2px solid var(--mock-gold);
+    outline-offset: 2px;
+  }
+
+  /* 20px bars, spaced a little further apart: at 18px in a 44px target the icon
+     looked undersized. The is-open rules above still collapse them into the
+     cross, being the more specific selector. */
+  .nav-toggle__bars,
+  .nav-toggle__bars::before,
+  .nav-toggle__bars::after { width: 20px; }
+  .nav-toggle__bars::before { top: -7px; }
+  .nav-toggle__bars::after { bottom: -7px; }
+}

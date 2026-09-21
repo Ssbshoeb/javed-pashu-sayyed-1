@@ -1,0 +1,151 @@
+# ---------------------------------------------------------------------------
+# Adv. Javed Pashu Sayyed — Apache / LiteSpeed configuration
+# ---------------------------------------------------------------------------
+# Upload the contents of this folder into the domain's document root
+# (public_html on Hostinger and most cPanel hosts).
+#
+# Everything that is not a real file on disk is routed to index.php. Static
+# files under /img, /css and /js are served directly by the web server and
+# never reach PHP.
+
+# ---------------------------------------------------------------------------
+# Routing
+# ---------------------------------------------------------------------------
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Some hosts serve the site from a subdirectory. Without this the rewrite
+    # target is resolved against the wrong base and every page 404s.
+    RewriteBase /
+
+    # Force HTTPS. Commented out because it must not be enabled before the
+    # certificate is actually issued — a redirect loop to a host with no
+    # certificate is worse than plain HTTP. Uncomment once TLS is live.
+    #
+    # RewriteCond %{HTTPS} !=on
+    # RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+    # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+    # Canonical host: send www to the bare domain (or the reverse — edit to
+    # match whichever the site is published as, and set SITE_URL in .env to the
+    # same one). Commented out until the domain is settled.
+    #
+    # RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+    # RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
+
+    # Strip a trailing slash from anything but the root, so /about/ and /about
+    # are not two URLs with the same content. The front controller normalises
+    # the path anyway; this makes the canonical form the one in the address bar.
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.+)/$ /$1 [L,R=301]
+
+    # Anything that is not an existing file or directory goes to the front
+    # controller.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Files that must never be served
+# ---------------------------------------------------------------------------
+
+# .env holds the mailbox password. The rewrite rules above would not stop a
+# request for it, because it IS a real file.
+<FilesMatch "^\.env|^\.env\..*|composer\.(json|lock)|\.md$|\.log$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+# Dotfiles in general.
+<IfModule mod_rewrite.c>
+    RewriteRule "(^|/)\." - [F]
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Security headers
+# ---------------------------------------------------------------------------
+# index.php sends the full set for every page it renders. These duplicate the
+# ones that also matter for STATIC files, which never reach PHP.
+
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Only sent over HTTPS: promising it over plain HTTP is a lie the browser
+    # then enforces on every future visit to the host.
+    <If "%{HTTPS} == 'on'">
+        Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    </If>
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Caching
+# ---------------------------------------------------------------------------
+# Images, CSS and JS are versioned by mtime in the markup (see asset() in
+# app/support/helpers.php), so they can be cached hard: a change to any of them
+# changes the URL.
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    ExpiresByType image/jpeg              "access plus 1 year"
+    ExpiresByType image/png               "access plus 1 year"
+    ExpiresByType image/webp              "access plus 1 year"
+    ExpiresByType image/svg+xml           "access plus 1 year"
+    ExpiresByType image/x-icon            "access plus 1 year"
+    ExpiresByType text/css                "access plus 1 year"
+    ExpiresByType application/javascript  "access plus 1 year"
+    ExpiresByType font/woff2              "access plus 1 year"
+
+    # HTML is never cached: index.php sends no-store, and a stale page would
+    # show one visitor's form errors to the next.
+    ExpiresByType text/html               "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_headers.c>
+    <FilesMatch "\.(jpg|jpeg|png|webp|svg|ico|css|js|woff2)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Compression
+# ---------------------------------------------------------------------------
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE application/xml image/svg+xml
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Uploads
+# ---------------------------------------------------------------------------
+# /upload-document accepts files up to 10 MB. PHP's defaults are usually
+# 2 MB (upload_max_filesize) and 8 MB (post_max_size), which would reject an
+# 8 MB affidavit before any of the application's own validation ran. The extra
+# headroom on post_max_size covers the multipart encoding and the other fields.
+#
+# These are ignored on hosts running PHP as CGI/FastCGI without
+# `AllowOverride Options`; on those, set the same values in the control panel's
+# PHP settings, or in a .user.ini file beside this one.
+
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+    php_value max_execution_time 120
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# Error documents
+# ---------------------------------------------------------------------------
+# The front controller renders the site's own 404 page, in the site's design.
+
+ErrorDocument 404 /index.php

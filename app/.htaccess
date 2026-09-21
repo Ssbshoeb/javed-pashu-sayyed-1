@@ -1,0 +1,12 @@
+# Nothing under app/ is ever served directly. Every file here also carries a
+# `defined('APP_RUNNING') or exit` guard at the top, so even a host that ignores
+# this file (nginx, or Apache with AllowOverride None) exposes no source and no
+# configuration — the two lines are belt and braces.
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

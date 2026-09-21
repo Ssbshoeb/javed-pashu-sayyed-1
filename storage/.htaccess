@@ -1,0 +1,12 @@
+# Nothing under storage/ is ever served directly: it holds the application log
+# and the rate-limit buckets. On a host that ignores this file (nginx, or Apache
+# with AllowOverride None), move the whole folder outside the document root and
+# point STORAGE_PATH at it in app/bootstrap.php.
+
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>
