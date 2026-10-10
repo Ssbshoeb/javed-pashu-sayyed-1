@@ -180,6 +180,10 @@ switch ($path) {
         page_insights();
         exit;
 
+    case route('media'):
+        page_media();
+        exit;
+
     case route('caseEvaluation'):
         page_case_evaluation();
         exit;

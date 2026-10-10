@@ -35,7 +35,7 @@ $about = practice('aboutPage');
             <source srcset="<?= e(src_set('/img/advocate-achievements-hero.webp')) ?>"
                     sizes="<?= e($aheroSizes) ?>" type="image/webp">
             <img src="/img/advocate-achievements-hero.jpg"<?= srcset_attr('/img/advocate-achievements-hero.jpg') ?>
-                 sizes="<?= e($aheroSizes) ?>" alt="" width="1030" height="745" fetchpriority="high">
+                 sizes="<?= e($aheroSizes) ?>" alt="Adv. Javed Pashu Sayyed, Advocate" width="1030" height="745" fetchpriority="high">
         </picture>
     </div>
 

@@ -79,6 +79,7 @@ function serve_sitemap(): void
         [route('whyUs'), 0.7, 'yearly', last_modified(CONTENT_FILE, $view('why-choose-us'))],
         [route('areas'), 0.9, 'monthly', last_modified(CONTENT_FILE, $view('practice-areas'))],
         [route('insights'), 0.7, 'monthly', last_modified(CONTENT_FILE, $view('insights'))],
+        [route('media'), 0.5, 'monthly', last_modified(CONTENT_FILE, $view('media'))],
         [route('caseEvaluation'), 0.8, 'yearly', last_modified(CONTENT_FILE, $view('case-evaluation'))],
         [route('upload'), 0.6, 'yearly', last_modified(CONTENT_FILE, $view('upload-document'))],
         [route('appointment'), 0.8, 'yearly', last_modified(CONTENT_FILE, $view('request-appointment'))],

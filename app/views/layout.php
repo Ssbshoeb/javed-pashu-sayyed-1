@@ -24,7 +24,13 @@ $disclaimer = $practice['disclaimer'];
 
     <title><?= e($meta['title']) ?></title>
     <meta name="description" content="<?= e($meta['description']) ?>">
+    <?php /* No meta keywords: Google ignores the tag, and a 20-term list is the
+             keyword stuffing config/practice.php says this site avoids. */ ?>
+    <meta name="author" content="<?= e($practice['name']) ?>">
+    <meta name="theme-color" content="#010B14">
     <link rel="canonical" href="<?= e($meta['canonical']) ?>">
+    <link rel="alternate" hreflang="en-IN" href="<?= e($meta['canonical']) ?>">
+    <link rel="alternate" hreflang="x-default" href="<?= e($meta['canonical']) ?>">
     <meta name="robots" content="<?= e($meta['robots']) ?>">
 
     <?php /* Open Graph. Without an image the link renders as a bare grey box
@@ -37,7 +43,7 @@ $disclaimer = $practice['disclaimer'];
     <meta property="og:description" content="<?= e($meta['description']) ?>">
     <meta property="og:url" content="<?= e($meta['canonical']) ?>">
     <meta property="og:image" content="<?= e($meta['image']) ?>">
-    <meta property="og:image:alt" content="<?= e($practice['name']) ?>">
+    <meta property="og:image:alt" content="<?= e($meta['imageAlt']) ?>">
     <?php if (!empty($meta['article'])): ?>
         <meta property="article:published_time" content="<?= e($meta['article']['publishedTime']) ?>">
         <meta property="article:modified_time" content="<?= e($meta['article']['modifiedTime']) ?>">
@@ -49,6 +55,7 @@ $disclaimer = $practice['disclaimer'];
     <meta name="twitter:title" content="<?= e($meta['title']) ?>">
     <meta name="twitter:description" content="<?= e($meta['description']) ?>">
     <meta name="twitter:image" content="<?= e($meta['image']) ?>">
+    <meta name="twitter:image:alt" content="<?= e($meta['imageAlt']) ?>">
 
     <?php /* The emblem carries the dark ground with it here rather than being
              transparent: a browser tab is usually light, and the gold-on-nothing

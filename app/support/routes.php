@@ -32,6 +32,8 @@ function route(string $name, ?string $param = null): string
             return '/practice-areas/' . rawurlencode((string) $param);
         case 'insights':
             return '/insights';
+        case 'media':
+            return '/media';
         case 'article':
             return '/insights/' . rawurlencode((string) $param);
         case 'caseEvaluation':

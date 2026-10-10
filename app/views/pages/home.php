@@ -40,12 +40,12 @@ $aboutNameRest = $aboutNamePrefix !== null ? substr($name, strlen('Adv. ')) : $n
     <section class="mhero">
         <?php /* Background-free cut-out, so the hero's own dark ground shows through -
                  see .mhero__media in site.css. */ ?>
-        <div class="mhero__media" aria-hidden="true">
+        <div class="mhero__media">
             <picture>
-                <source srcset="<?= e(src_set('/img/advocate-cutout.webp')) ?>"
+                <source srcset="<?= e(src_set('/img/advocate-cutout-v2.webp')) ?>"
                         sizes="<?= e($mheroSizes) ?>" type="image/webp">
-                <img src="/img/advocate-cutout.png"<?= srcset_attr('/img/advocate-cutout.png') ?>
-                     sizes="<?= e($mheroSizes) ?>" alt="" width="833" height="766"
+                <img src="/img/advocate-cutout-v2.png"<?= srcset_attr('/img/advocate-cutout-v2.png') ?>
+                     sizes="<?= e($mheroSizes) ?>" alt="Adv. Javed Pashu Sayyed, Advocate in Mumbai &amp; Pune" width="833" height="766"
                      fetchpriority="high">
             </picture>
         </div>
@@ -113,12 +113,12 @@ $aboutNameRest = $aboutNamePrefix !== null ? substr($name, strlen('Adv. ')) : $n
 
             <div class="aboutband__portrait">
                 <picture>
-                    <source srcset="<?= e(src_set('/img/advocate-cutout.webp')) ?>"
+                    <source srcset="<?= e(src_set('/img/advocate-cutout-v2.webp')) ?>"
                             sizes="<?= e($portraitSizes) ?>" type="image/webp">
-                    <img src="/img/advocate-cutout.png"<?= srcset_attr('/img/advocate-cutout.png') ?>
+                    <img src="/img/advocate-cutout-v2.png"<?= srcset_attr('/img/advocate-cutout-v2.png') ?>
                          sizes="<?= e($portraitSizes) ?>"
                          alt="<?= e($name) ?> speaking at a lectern"
-                         loading="lazy" decoding="async" width="1280" height="1037">
+                         loading="lazy" decoding="async" width="833" height="766">
                 </picture>
             </div>
 
@@ -263,21 +263,30 @@ $aboutNameRest = $aboutNamePrefix !== null ? substr($name, strlen('Adv. ')) : $n
         </div>
     </section>
 
-    <?php /* 7. Testimonials carousel -------------------------------------------- */ ?>
-    <section class="section" id="testimonials-section">
+    <?php /* 7. Frequently asked questions ---------------------------------------
+             Replaced the client-feedback carousel. General, factual answers only:
+             no fees, no results, no claim about outcomes (Rule 36). The same list
+             is emitted as FAQPage structured data by page_home(). */ ?>
+    <section class="section" id="faq-section">
         <div class="shell">
             <div data-reveal>
-                <p class="eyebrow">Client feedback</p>
+                <p class="eyebrow">Frequently asked</p>
                 <h2 class="ruled" style="margin-bottom:1.6rem;">
-                    In the words of those the chamber has acted for
+                    Questions about engaging the chamber
                 </h2>
             </div>
 
-            <?php partial('partials/testimonials', ['items' => $practiceData['testimonials']]); ?>
+            <div class="faq" data-reveal>
+                <?php foreach ($practiceData['homeFaqs'] as $faq): ?>
+                    <details>
+                        <summary><?= e($faq['q']) ?></summary>
+                        <div class="faq__body"><?= e($faq['a']) ?></div>
+                    </details>
+                <?php endforeach; ?>
+            </div>
 
-            <p style="margin-top:0.6rem;font-size:0.84rem;color:var(--muted);">
-                Published with the consent of the clients concerned. Names are withheld where consent was
-                given on that basis.
+            <p style="margin-top:0.9rem;font-size:0.84rem;color:var(--muted);">
+                General information only, not legal advice. The position in any matter depends on its own facts.
             </p>
         </div>
     </section>
@@ -303,6 +312,25 @@ $aboutNameRest = $aboutNamePrefix !== null ? substr($name, strlen('Adv. ')) : $n
             </div>
         </div>
     </section>
+
+    <?php /* Featured in the media (hidden until media entries exist) ------------- */ ?>
+    <?php $mediaLatest = array_slice(media_items(), 0, 3); ?>
+    <?php if ($mediaLatest !== []): ?>
+    <section class="section" id="media">
+        <div class="shell">
+            <div data-reveal>
+                <p class="eyebrow">Media</p>
+                <h2 class="ruled" style="margin-bottom:1.4rem;">Featured in the media</h2>
+            </div>
+            <div class="mlist" data-reveal-group>
+                <?php foreach ($mediaLatest as $m): ?>
+                    <?php require APP_PATH . '/views/partials/media-card.php'; ?>
+                <?php endforeach; ?>
+            </div>
+            <p style="margin-top:1.4rem;"><a class="card__more" href="<?= e(route('media')) ?>">View all media</a></p>
+        </div>
+    </section>
+    <?php endif; ?>
 
     <?php /* 9. Insights ---------------------------------------------------------- */ ?>
     <section class="section section--sunk" id="insights">

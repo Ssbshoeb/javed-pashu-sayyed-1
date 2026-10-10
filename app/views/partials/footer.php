@@ -29,6 +29,7 @@ $areas = practice('areas');
                     <li><a href="<?= e(route('about')) ?>">About</a></li>
                     <li><a href="<?= e(route('whyUs')) ?>">Approach</a></li>
                     <li><a href="<?= e(route('insights')) ?>">Insights</a></li>
+                    <li><a href="<?= e(route('media')) ?>">Media</a></li>
                     <li><a href="<?= e(route('caseEvaluation')) ?>">Case Evaluation</a></li>
                     <li><a href="<?= e(route('upload')) ?>">Upload a Document</a></li>
                     <li><a href="<?= e(route('appointment')) ?>">Request an Appointment</a></li>

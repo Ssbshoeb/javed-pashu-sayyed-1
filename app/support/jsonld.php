@@ -26,11 +26,16 @@ function legal_service_schema(): array
 
     $schema = [
         '@context' => 'https://schema.org',
-        '@type' => 'LegalService',
+        // Attorney is a LegalService subtype; the pair lets a single advocate's
+        // chamber be read as both the practice and the lawyer.
+        '@type' => ['LegalService', 'Attorney'],
         '@id' => $siteUrl . '/#legalservice',
         'name' => practice('firm'),
+        'alternateName' => 'Advocate Javed Pashu Sayyed',
         'description' => practice('shortIntro'),
         'url' => $siteUrl . '/',
+        'logo' => absolute_url('/img/logo-mark.png'),
+        'hasMap' => 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($contact['mapQuery']),
         'email' => $contact['email'],
         'priceRange' => '₹₹',
         'address' => [
@@ -41,7 +46,29 @@ function legal_service_schema(): array
             'postalCode' => '400021',
             'addressCountry' => 'IN',
         ],
-        'areaServed' => ['Mumbai', 'Pune', 'Maharashtra', 'India'],
+        'areaServed' => [
+            ['@type' => 'City', 'name' => 'Mumbai'],
+            ['@type' => 'City', 'name' => 'Pune'],
+            ['@type' => 'State', 'name' => 'Maharashtra'],
+            ['@type' => 'Country', 'name' => 'India'],
+        ],
+        // Each practice area as a named service pointing at its own page.
+        'hasOfferCatalog' => [
+            '@type' => 'OfferCatalog',
+            'name' => 'Areas of practice',
+            'itemListElement' => array_values(array_map(
+                static fn (string $slug, array $area): array => [
+                    '@type' => 'Offer',
+                    'itemOffered' => [
+                        '@type' => 'Service',
+                        'name' => $area['title'],
+                        'url' => absolute_url(route('area', $slug)),
+                    ],
+                ],
+                array_keys(practice('areas')),
+                practice('areas')
+            )),
+        ],
         'image' => absolute_url(practice('seo.shareImage')),
         'geo' => [
             '@type' => 'GeoCoordinates',
@@ -65,7 +92,10 @@ function legal_service_schema(): array
         )),
         'founder' => [
             '@type' => 'Person',
+            '@id' => $siteUrl . '/#advocate',
             'name' => practice('name'),
+            'url' => absolute_url(route('about')),
+            'image' => absolute_url('/img/advocate-about-hero.jpg'),
             'jobTitle' => 'Advocate',
             'description' => practice('bio')[0],
             'knowsLanguage' => practice('languages'),
@@ -168,6 +198,7 @@ function article_schema(string $slug, array $article): array
         'image' => absolute_url(practice('seo.shareImage')),
         'author' => [
             '@type' => 'Person',
+            '@id' => site_url() . '/#advocate',
             'name' => practice('name'),
             'jobTitle' => 'Advocate',
             // Ties the byline to the About page, so the author is a known
@@ -176,8 +207,72 @@ function article_schema(string $slug, array $article): array
         ],
         'publisher' => [
             '@type' => 'Organization',
+            '@id' => site_url() . '/#legalservice',
             'name' => practice('firm'),
-            'logo' => ['@type' => 'ImageObject', 'url' => absolute_url(practice('seo.shareImage'))],
+            'logo' => ['@type' => 'ImageObject', 'url' => absolute_url('/img/logo-mark.png')],
         ],
+    ];
+}
+
+/**
+ * The page itself, typed (AboutPage, ContactPage, CollectionPage ...), tied to
+ * the site and to the advocate so a crawler can see what each URL is for.
+ */
+function webpage_schema(string $type, string $path, string $name, string $description): array
+{
+    return [
+        '@context' => 'https://schema.org',
+        '@type' => $type,
+        '@id' => absolute_url($path) . '#webpage',
+        'url' => absolute_url($path),
+        'name' => $name,
+        'description' => $description,
+        'inLanguage' => 'en-IN',
+        'isPartOf' => ['@id' => site_url() . '/#website'],
+        'about' => ['@id' => site_url() . '/#legalservice'],
+    ];
+}
+
+/** One practice area as a Service offered by the chamber. */
+function service_schema(string $slug, array $area): array
+{
+    return [
+        '@context' => 'https://schema.org',
+        '@type' => 'Service',
+        'name' => $area['title'],
+        'serviceType' => $area['title'],
+        'description' => $area['summary'],
+        'url' => absolute_url(route('area', $slug)),
+        'provider' => ['@id' => site_url() . '/#legalservice'],
+        'areaServed' => [
+            ['@type' => 'City', 'name' => 'Mumbai'],
+            ['@type' => 'City', 'name' => 'Pune'],
+        ],
+    ];
+}
+
+/** The /media page: coverage published elsewhere, as a list of articles. */
+function media_list_schema(array $items): array
+{
+    return [
+        '@context' => 'https://schema.org',
+        '@type' => 'ItemList',
+        'itemListElement' => array_map(
+            static fn (array $m, int $i): array => [
+                '@type' => 'ListItem',
+                'position' => $i + 1,
+                'item' => array_filter([
+                    '@type' => 'Article',
+                    'headline' => $m['title'],
+                    'url' => $m['url'],
+                    'datePublished' => $m['date'] ?? null,
+                    'image' => !empty($m['image']) ? absolute_url($m['image']) : null,
+                    'publisher' => ['@type' => 'Organization', 'name' => $m['source'] ?? 'Media'],
+                    'about' => ['@id' => site_url() . '/#advocate'],
+                ]),
+            ],
+            array_values($items),
+            array_keys(array_values($items))
+        ),
     ];
 }

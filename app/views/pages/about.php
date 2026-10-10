@@ -34,12 +34,12 @@ $about = practice('aboutPage');
     showing the same, uncropped image everywhere.
 */ ?>
 <section class="ahero ahero--photo">
-    <div class="ahero__photo" aria-hidden="true">
+    <div class="ahero__photo">
         <picture>
             <source srcset="<?= e(src_set('/img/advocate-about-hero.webp')) ?>"
                     sizes="<?= e($aheroSizes) ?>" type="image/webp">
             <img src="/img/advocate-about-hero.jpg"<?= srcset_attr('/img/advocate-about-hero.jpg') ?>
-                 sizes="<?= e($aheroSizes) ?>" alt="" width="1086" height="786" fetchpriority="high">
+                 sizes="<?= e($aheroSizes) ?>" alt="Adv. Javed Pashu Sayyed, Advocate in Mumbai" width="1086" height="786" fetchpriority="high">
         </picture>
     </div>
 

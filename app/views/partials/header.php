@@ -82,6 +82,7 @@ $current = static function (string ...$paths) use ($path): string {
             <a href="<?= e(route('about')) ?>#courts">Courts</a>
             <a href="<?= e(route('achievements')) ?>"<?= $current(route('achievements')) ?>>Achievements</a>
             <a href="<?= e(route('insights')) ?>" data-scroll="#insights"<?= $current(route('insights')) ?>>Insights</a>
+            <a href="<?= e(route('media')) ?>"<?= $current(route('media')) ?>>Media</a>
             <a href="<?= e(route('contact')) ?>" data-scroll="#contact"<?= $current(route('contact')) ?>>Contact</a>
             <a class="nav__cta" href="<?= e(route('appointment')) ?>"<?= $current(route('appointment')) ?>>
                 <?= icon('scales') ?>

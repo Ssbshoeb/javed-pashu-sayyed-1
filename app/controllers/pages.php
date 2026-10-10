@@ -24,6 +24,8 @@ const AHERO_SIZES = '(max-width: 900px) 100vw, min(57.5vw, 1060px)';
 function page_home(): void
 {
     push_json_ld(website_schema());
+    push_json_ld(faq_schema(practice('homeFaqs')));
+    push_json_ld(webpage_schema('WebPage', route('home'), 'Advocate in Mumbai & Pune', practice('shortIntro')));
 
     /*
         The hero cut-out is the largest thing above the fold, and fetching it
@@ -36,9 +38,9 @@ function page_home(): void
         picks — the preload would cost bandwidth rather than save it.
     */
     view_share('preload', [[
-        'href' => '/img/advocate-cutout.webp',
+        'href' => '/img/advocate-cutout-v2.webp',
         'type' => 'image/webp',
-        'srcset' => src_set('/img/advocate-cutout.webp'),
+        'srcset' => src_set('/img/advocate-cutout-v2.webp'),
         'sizes' => MHERO_SIZES,
     ]]);
 
@@ -66,8 +68,8 @@ function page_home(): void
     $statTiles[] = ['value' => count(practice('languages')), 'suffix' => '', 'label' => 'Languages'];
 
     view('home', page_metadata([
-        'title' => 'Adv. Javed Pashu Sayyed — Advocate, Bombay High Court & Supreme Court',
-        'description' => 'Chamber of Adv. Javed Pashu Sayyed, Advocate practising at the Bombay High Court and Supreme Court of India in Mumbai. Corporate, arbitration, criminal, cyber crime and family law.',
+        'title' => 'Advocate in Mumbai & Pune, Bombay High Court — Adv. Javed Pashu Sayyed',
+        'description' => 'Chamber of Adv. Javed Pashu Sayyed, Advocate near you practising at the Bombay High Court, Supreme Court of India, and Pune Courts. Corporate, arbitration, criminal, cyber crime and family law.',
         'path' => route('home'),
     ]), [
         'statTiles' => $statTiles,
@@ -79,9 +81,12 @@ function page_home(): void
 function page_about(): void
 {
     push_json_ld(breadcrumb_schema([['About the Advocate', route('about')]]));
+    push_json_ld(webpage_schema('AboutPage', route('about'), 'About Adv. Javed Pashu Sayyed', practice('bio')[0]));
 
     view('about', page_metadata([
         'title' => 'About Adv. Javed Pashu Sayyed — Advocate, Bombay High Court',
+        'image' => '/img/advocate-about-hero.jpg',
+        'imageAlt' => 'Adv. Javed Pashu Sayyed, Advocate practising at the Bombay High Court',
         'description' => 'Adv. Javed Pashu Sayyed — Advocate with 20+ years experience before the Supreme Court of India, Bombay High Court, and Courts across India. Practice background, courts and memberships.',
         'path' => route('about'),
     ]), ['aheroSizes' => AHERO_SIZES]);
@@ -112,10 +117,11 @@ function page_why_us(): void
 function page_areas(): void
 {
     push_json_ld(breadcrumb_schema([['Practice Areas', route('areas')]]));
+    push_json_ld(webpage_schema('CollectionPage', route('areas'), 'Legal Practice Areas in Mumbai & Pune', 'Areas of practice of Adv. Javed Pashu Sayyed.'));
 
     view('practice-areas', page_metadata([
-        'title' => 'Legal Practice Areas in Mumbai — Adv. Javed Pashu Sayyed',
-        'description' => 'Legal practice areas of Adv. Javed Pashu Sayyed: Corporate & Commercial Law, Arbitration, Criminal Litigation, Cyber Crime, Family Law, Property Disputes, and Strategic Advisory in Mumbai.',
+        'title' => 'Legal Practice Areas in Mumbai & Pune — Adv. Javed Pashu Sayyed',
+        'description' => 'Legal practice areas of Adv. Javed Pashu Sayyed: Corporate & Commercial Law, Arbitration, Criminal Litigation, Cyber Crime, Family Law, Property Disputes, and Strategic Advisory by an advocate near you in Mumbai & Pune.',
         'path' => route('areas'),
     ]));
 }
@@ -130,6 +136,7 @@ function page_area(string $slug): void
         return;
     }
 
+    push_json_ld(service_schema($slug, $area));
     push_json_ld(faq_schema($area['faqs']));
     push_json_ld(breadcrumb_schema([
         ['Practice Areas', route('areas')],
@@ -137,8 +144,11 @@ function page_area(string $slug): void
     ]));
 
     view('practice-area', page_metadata([
-        'title' => $area['title'] . ' Advocate in Mumbai',
-        'description' => $area['summary'],
+        'title' => $area['title'] . ' Advocate in Mumbai & Pune',
+        'noBrand' => true,
+        'image' => '/img/area-' . $area['image'] . '.jpg',
+        'imageAlt' => $area['title'] . ' — Adv. Javed Pashu Sayyed',
+        'description' => $area['summary'] . ' ' . $area['title'] . ' advocate for clients in Mumbai and Pune, appearing before the Bombay High Court, Pune Courts and the Supreme Court of India. Book a consultation.',
         'path' => route('area', $slug),
     ]), ['area' => $area, 'slug' => $slug]);
 }
@@ -146,12 +156,43 @@ function page_area(string $slug): void
 function page_insights(): void
 {
     push_json_ld(breadcrumb_schema([['Insights', route('insights')]]));
+    push_json_ld(webpage_schema('CollectionPage', route('insights'), 'Legal Insights & Procedure Notes', 'Legal insights and procedure notes by Adv. Javed Pashu Sayyed.'));
 
     view('insights', page_metadata([
-        'title' => 'Legal Insights & Procedural Notes — Adv. Javed Pashu Sayyed',
+        'title' => 'Legal Insights & Procedure Notes — Advocate in Mumbai & Pune',
         'description' => 'Legal insights, procedure notes and practical legal information by Adv. Javed Pashu Sayyed, Advocate Bombay High Court.',
         'path' => route('insights'),
     ]));
+}
+
+/** Media items, newest first. Entries without a valid http(s) URL are dropped. */
+function media_items(): array
+{
+    $items = array_filter(
+        (array) practice('media'),
+        static fn ($m): bool => is_array($m)
+            && !empty($m['title'])
+            && preg_match('#^https?://#i', (string) ($m['url'] ?? '')) === 1
+    );
+    usort($items, static fn (array $a, array $b): int => strcmp((string) ($b['date'] ?? ''), (string) ($a['date'] ?? '')));
+
+    return $items;
+}
+
+function page_media(): void
+{
+    $items = media_items();
+    push_json_ld(breadcrumb_schema([['Media', route('media')]]));
+    push_json_ld(webpage_schema('CollectionPage', route('media'), 'Media & Press', 'Articles and coverage featuring Adv. Javed Pashu Sayyed.'));
+    if ($items) {
+        push_json_ld(media_list_schema($items));
+    }
+
+    view('media', page_metadata([
+        'title' => 'Media & Press — Adv. Javed Pashu Sayyed',
+        'description' => 'Articles, interviews and coverage featuring Adv. Javed Pashu Sayyed, Advocate Bombay High Court.',
+        'path' => route('media'),
+    ]), ['items' => $items]);
 }
 
 function page_article(string $slug): void
@@ -209,8 +250,8 @@ function page_appointment(): void
     push_json_ld(breadcrumb_schema([['Request Appointment', route('appointment')]]));
 
     view('request-appointment', page_metadata([
-        'title' => 'Request Consultation Appointment — Adv. Javed Pashu Sayyed',
-        'description' => 'Request a legal consultation appointment with Adv. Javed Pashu Sayyed at Nariman Point, Mumbai, or schedule a telephone/video consultation.',
+        'title' => 'Request Consultation Appointment in Mumbai & Pune — Adv. Javed Pashu Sayyed',
+        'description' => 'Request a legal consultation appointment with an advocate near you. Adv. Javed Pashu Sayyed at Nariman Point, Mumbai, or schedule a telephone/video consultation for Pune matters.',
         'path' => route('appointment'),
     ]));
 }
@@ -218,10 +259,11 @@ function page_appointment(): void
 function page_contact(): void
 {
     push_json_ld(breadcrumb_schema([['Contact', route('contact')]]));
+    push_json_ld(webpage_schema('ContactPage', route('contact'), 'Contact Adv. Javed Pashu Sayyed', 'Chamber address, hours and enquiry form.'));
 
     view('contact', page_metadata([
-        'title' => 'Contact Chamber at Nariman Point, Mumbai — Adv. Javed Pashu Sayyed',
-        'description' => 'Contact the Chamber of Adv. Javed Pashu Sayyed at 2nd Floor, WeWork, Express Towers, Nariman Point, Mumbai. Legal consultation, appointment booking and general enquiry.',
+        'title' => 'Contact Chamber in Mumbai & Pune — Adv. Javed Pashu Sayyed',
+        'description' => 'Contact the Chamber of Adv. Javed Pashu Sayyed to find an advocate near you. Office at Nariman Point, Mumbai. Legal consultation and appointment booking for Mumbai and Pune.',
         'path' => route('contact'),
     ]));
 }

@@ -18,10 +18,10 @@ return [
     // The site runs under the advocate's own name, not a firm name. This value
     // also fills the disclaimer's liability clause and the footer copyright.
     'firm' => 'Adv. Javed Pashu Sayyed',
-    'tagline' => 'Advocate — Corporate & Commercial Law · Arbitration · Criminal Law · Cyber Crime · Family Law',
-    'shortIntro' => 'Advocate practising before the High Court of Judicature at Bombay and the Supreme Court of India, combining over two decades of senior corporate legal leadership with a litigation and dispute-resolution practice.',
+    'tagline' => 'Advocate in Mumbai & Pune — Corporate & Commercial Law · Arbitration · Criminal Law · Cyber Crime',
+    'shortIntro' => 'Advocate near you practising before the High Court of Judicature at Bombay, Pune Courts, and the Supreme Court of India, combining over two decades of senior corporate legal leadership with a litigation and dispute-resolution practice.',
 
-    'strapline' => '20+ Years of Corporate & Legal Experience · Strategic Counsel · Litigation & Dispute Resolution',
+    'strapline' => '20+ Years of Corporate & Legal Experience · Advocate in Mumbai & Pune · Litigation & Dispute Resolution',
 
     'enrolment' => 'Enrolled with the Bar Council of Maharashtra & Goa', // TODO add enrolment number
     'qualifications' => ['LL.B.'], // TODO confirm full qualifications
@@ -838,6 +838,38 @@ return [
     ],
 
     /*
+    | Home page FAQ. General questions about how the chamber works - no fees,
+    | no outcomes, nothing that reads as solicitation (Rule 36). Also emitted
+    | as FAQPage structured data. Have the advocate confirm the answers.
+    */
+    'homeFaqs' => [
+        [
+            'q' => 'Where does the chamber practise?',
+            'a' => 'The chamber appears before the High Court of Judicature at Bombay, the Supreme Court of India, the Mumbai Sessions Court and the Pune Courts, and in matters before other High Courts, tribunals and forums. The office is at Express Towers, Nariman Point, Mumbai.',
+        ],
+        [
+            'q' => 'Which areas of law does the chamber handle?',
+            'a' => 'Corporate and commercial law, arbitration and dispute resolution, criminal litigation, cyber crime, family and matrimonial law, constitutional and writ matters, and property and commercial disputes, along with strategic legal advisory. Each is described on the Practice Areas page.',
+        ],
+        [
+            'q' => 'How do I request a consultation?',
+            'a' => 'Use the Request Appointment page to choose a time slot, or the Contact page to send an enquiry. The chamber confirms the slot or proposes an alternative. A request is not a confirmed booking until it is confirmed by the chamber.',
+        ],
+        [
+            'q' => 'What should I bring to the first consultation?',
+            'a' => 'The documents relevant to the matter: notices, orders, agreements, FIR copies or correspondence, as applicable. Each practice area page lists what is usually useful for that kind of matter.',
+        ],
+        [
+            'q' => 'Can I send documents through the website?',
+            'a' => 'Yes, through the Upload Document page, which delivers the file to the chamber by email. Do not send details of a pending investigation or privileged material through the website; arrange a consultation instead.',
+        ],
+        [
+            'q' => 'Does using this website create a lawyer-client relationship?',
+            'a' => 'No. The information on this website is general and is not legal advice. A lawyer-client relationship arises only when the chamber agrees to act in a matter. See the Disclaimer for the full terms.',
+        ],
+    ],
+
+    /*
     | Client feedback. Only publish an entry where written consent has been
     | recorded. Set `attribution` to null to display anonymously.
     | TODO replace with genuine, consented feedback before launch.
@@ -857,6 +889,81 @@ return [
             'quote' => 'The matter was handled with discretion from beginning to end.',
             'attribution' => null,
             'matter' => 'Family matter, 2024',
+        ],
+    ],
+
+    /*
+    | Media: articles and coverage published ABOUT or BY the advocate elsewhere.
+    | Add one entry per item; they are sorted by date on output. Shown on /media
+    | and (latest three) on the home page.
+    |
+    |   'title'  => headline as published
+    |   'source' => publication / channel name
+    |   'date'   => 'YYYY-MM-DD'
+    |   'url'    => full external link (opens in a new tab)
+    |   'type'   => 'Article' | 'Interview' | 'Video' ... (optional)
+    |   'image'  => optional thumbnail path, e.g. '/img/media/x.webp'
+    |
+    | RULE 36: list only what was published; no comparisons, rankings or results.
+    */
+    // Brand colour + initials for each source's badge. Unlisted sources fall back to gold.
+    'mediaSources' => [
+        'Mid-Day' => ['mark' => 'MD', 'color' => '#C8102E'],
+        'Global Cover Story' => ['mark' => 'GC', 'color' => '#1F6F8B'],
+        'Business News This Week' => ['mark' => 'BN', 'color' => '#2E7D4F'],
+        'Business Upturn' => ['mark' => 'BU', 'color' => '#C2410C'],
+        'The Eastern Herald' => ['mark' => 'EH', 'color' => '#6D3FA0'],
+    ],
+    'media' => [
+        [
+            'topic' => 'Criminal Law',
+            'title' => 'Illegal Arrest in India: Advocate Javed Pashu Sayyed Explains Constitutional Rights and BNSS Safeguards',
+            'source' => 'Mid-Day',
+            'excerpt' => 'Understand illegal arrest safeguards in India, including constitutional rights, BNSS provisions and legal remedies.',
+            'image' => '/img/media/mid-day-illegal-arrest.webp',
+            'date' => '2026-09-30',
+            'url' => 'https://www.mid-day.com/buzzfeed/article/illegal-arrest-in-india-advocate-javed-pashu-sayyed-explains-constitutional-rights-and-bnss-safeguards-11043',
+            'type' => 'Article',
+        ],
+        [
+            'topic' => 'Profile',
+            'title' => 'Adv. Javed Pashu Sayyed: From Corporate Boardrooms to the Courtroom',
+            'source' => 'Global Cover Story',
+            'excerpt' => 'A Mumbai-based advocate practising since 2009 across criminal law, arbitration and commercial disputes, on his journey from corporate roles to the Bombay High Court.',
+            'image' => '/img/media/global-cover-story-profile.webp',
+            'date' => '2026-09-30',
+            'url' => 'https://globalcoverstory.com/articles/javed-pashu-sayyed-advocate-corporate-to-courtroom',
+            'type' => 'Profile',
+        ],
+        [
+            'title' => 'Cyber Crime in India 2026: What Victims Should Do After Online Fraud and What Happens When a Bank Account Is Frozen',
+            'topic' => 'Cyber Crime',
+            'source' => 'Business News This Week',
+            'excerpt' => 'From digital arrest and fake investment platforms to UPI fraud, mule accounts and bank-account freezes, the first legal steps a victim can take.',
+            'image' => '/img/media/business-news-this-week-cyber-crime.webp',
+            'date' => '2026-10-06',
+            'url' => 'https://businessnewsthisweek.com/news/cyber-crime-in-india-2026-what-victims-should-do-after-online-fraud-and-what-happens-when-a-bank-account-is-frozen/',
+            'type' => 'Article',
+        ],
+        [
+            'title' => 'Cyber Crime in India 2026: What Victims Should Do After Online Fraud and What Happens When a Bank Account Is Frozen',
+            'topic' => 'Cyber Crime',
+            'source' => 'Business Upturn',
+            'excerpt' => 'From digital arrest and fake investment platforms to UPI fraud, mule accounts and bank-account freezes, the first legal steps a victim can take.',
+            'image' => '/img/media/business-upturn-cyber-crime.webp',
+            'date' => '2026-10-06',
+            'url' => 'https://businessupturn.com/brand-post/cyber-crime-in-india-2026-what-victims-should-do-after-online-fraud-and-what-happens-when-a-bank-account-is-frozen/',
+            'type' => 'Article',
+        ],
+        [
+            'title' => 'Cyber Crime in India 2026: What Victims Should Do After Online Fraud and What Happens When a Bank Account Is Frozen',
+            'topic' => 'Cyber Crime',
+            'source' => 'The Eastern Herald',
+            'excerpt' => 'From digital arrest and fake investment platforms to UPI fraud, mule accounts and bank-account freezes, the first legal steps a victim can take.',
+            'image' => '/img/media/eastern-herald-cyber-crime.webp',
+            'date' => '2026-10-06',
+            'url' => 'https://easternherald.com/2026/10/06/cyber-crime-in-india-2026-what-victims-should-do-after-online-fraud-and-what-happens-when-a-bank-account-is-frozen/',
+            'type' => 'Article',
         ],
     ],
 
