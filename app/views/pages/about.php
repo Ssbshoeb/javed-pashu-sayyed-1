@@ -144,7 +144,7 @@ $about = practice('aboutPage');
                         <?php /* The artwork carries its own disc, so it replaces the styled
                                  circle rather than sitting inside one. */ ?>
                         <img class="members__ico members__ico--img" src="/img/<?= e($membership['img']) ?>"
-                             alt="" loading="lazy" decoding="async">
+                             alt="<?= e($membership['name']) ?>" loading="lazy" decoding="async">
                     <?php else: ?>
                         <span class="members__ico"><?= icon($membership['icon']) ?></span>
                     <?php endif; ?>

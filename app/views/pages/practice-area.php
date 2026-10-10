@@ -110,6 +110,20 @@ $areas = practice('areas');
                 chamber.
             </div>
 
+            <?php
+            $related = array_filter(practice('articles'), static fn (array $a): bool => ($a['area'] ?? null) === $slug);
+            ?>
+            <?php if ($related): ?>
+                <div class="tile">
+                    <h3 style="margin-bottom:0.5rem;">Related notes</h3>
+                    <ul class="list-check" style="margin-top:10px;margin-bottom:0;">
+                        <?php foreach ($related as $aSlug => $a): ?>
+                            <li><a href="<?= e(route('article', $aSlug)) ?>"><?= e($a['title']) ?></a></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+
             <div class="btn-row">
                 <a class="btn btn--primary" href="<?= e(route('appointment')) ?>">Request an appointment</a>
                 <a class="btn btn--ghost" href="<?= e(route('contact')) ?>">Contact details</a>

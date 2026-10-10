@@ -56,6 +56,7 @@ $aboutNameRest = $aboutNamePrefix !== null ? substr($name, strlen('Adv. ')) : $n
                 <h1 class="mhero__name">
                     <span>Adv. Javed</span>
                     <span class="mhero__name--gold">Pashu Sayyed</span>
+                    <span class="visually-hidden"> &mdash; Advocate in Mumbai &amp; Pune, Bombay High Court</span>
                 </h1>
                 <?php /* "Results" implies an assured outcome. Flagged, kept as instructed. */ ?>
                 <p class="mhero__strap">Advocacy. Strategy. Results.</p>

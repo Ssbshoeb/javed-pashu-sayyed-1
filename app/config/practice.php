@@ -974,6 +974,8 @@ return [
     */
     'articles' => [
         'what-to-do-when-an-fir-is-registered' => [
+            // Practice area this note belongs to, for the internal links both ways.
+            'area' => 'criminal',
             'title' => 'What to do in the first 48 hours after an FIR is registered',
             // Shorter form for the <title> tag only — the page heading uses `title`.
             'seoTitle' => 'The first 48 hours after an FIR',
@@ -989,6 +991,8 @@ return [
             ],
         ],
         'first-hours-of-an-online-fraud' => [
+            // Practice area this note belongs to, for the internal links both ways.
+            'area' => 'cyber-crime',
             'title' => 'The first hours of an online fraud, and why they decide the outcome',
             'seoTitle' => 'The first hours of an online fraud',
             'category' => 'Cyber Crime',
@@ -1004,6 +1008,8 @@ return [
             ],
         ],
         'reading-an-arbitration-clause' => [
+            // Practice area this note belongs to, for the internal links both ways.
+            'area' => 'arbitration',
             'title' => 'Reading an arbitration clause before you sign it',
             'seoTitle' => 'Reading an arbitration clause',
             'category' => 'Arbitration',

@@ -14,6 +14,7 @@ $articles = practice('articles');
         <span class="article-meta" style="margin-bottom:1rem;">
             <span class="tag"><?= e($article['category']) ?></span>
             <span class="ref"><?= e(long_date($article['date'])) ?></span>
+            <span class="ref">By <a href="<?= e(route('about')) ?>"><?= e(practice('name')) ?></a></span>
         </span>
         <h1><?= e($article['title']) ?></h1>
         <p class="lede" style="margin-top:1rem;"><?= e($article['excerpt']) ?></p>
@@ -32,6 +33,13 @@ $articles = practice('articles');
                 address any particular set of facts, and no lawyer&ndash;client relationship arises from
                 reading it. Independent advice should be taken on any specific matter.
             </div>
+
+            <?php if (!empty($article['area']) && is_array(practice('areas.' . $article['area']))): ?>
+                <p style="margin-top:1.4rem;">
+                    Related practice area:
+                    <a href="<?= e(route('area', $article['area'])) ?>"><?= e(practice('areas.' . $article['area'] . '.title')) ?></a>
+                </p>
+            <?php endif; ?>
         </div>
     </div>
 </section>
