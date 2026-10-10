@@ -46,6 +46,11 @@ $areas = practice('areas');
                         <li><a href="tel:<?= e($contact['phoneLink']) ?>"><?= e($contact['phone']) ?></a></li>
                     <?php endif; ?>
                     <li><a href="mailto:<?= e($contact['email']) ?>"><?= e($contact['email']) ?></a></li>
+                    <?php foreach (['linkedin' => 'LinkedIn', 'facebook' => 'Facebook', 'instagram' => 'Instagram'] as $key => $label): ?>
+                        <?php if ($url = practice('seo.profiles.' . $key)): ?>
+                            <li><a href="<?= e($url) ?>" target="_blank" rel="me noopener noreferrer"><?= e($label) ?></a></li>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
                 </ul>
             </div>
         </div>

@@ -85,7 +85,9 @@ return [
         // Filled in only once the profiles actually exist. An empty value is
         // omitted from the structured data rather than published as a dead link.
         'profiles' => [
-            'linkedin' => '', // TODO advocate's LinkedIn profile URL
+            'linkedin' => 'https://www.linkedin.com/in/javed-pashu-sayyed-577675437',
+            'facebook' => 'https://www.facebook.com/share/19Ru1BDMZC/',
+            'instagram' => 'https://www.instagram.com/adv.javedpashusayyed',
             'google' => '',   // TODO Google Business Profile URL, once claimed
         ],
     ],
